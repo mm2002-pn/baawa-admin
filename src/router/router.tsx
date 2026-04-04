@@ -6,8 +6,11 @@ import { lazy, Suspense } from 'react'
 import LoginPage from '../pages/auth/Login'
 import DashboardPage from '../pages/Dashboard'
 
-// Lazy loaded pages (will be created)
+// Lazy loaded pages
 const UsersPage = lazy(() => import('../pages/users/UsersList'))
+const CreateUserPage = lazy(() => import('../pages/users/CreateUser'))
+const EditUserPage = lazy(() => import('../pages/users/EditUser'))
+const UserDetailsPage = lazy(() => import('../pages/users/UserDetails'))
 const OfficersPage = lazy(() => import('../pages/officers/OfficersList'))
 const SignalementsPage = lazy(() => import('../pages/signalements/SignalementsList'))
 const TipsPage = lazy(() => import('../pages/tips/TipsList'))
@@ -37,6 +40,36 @@ export const router = createBrowserRouter([
       <ProtectedRoute>
         <Suspense fallback={<LoadingFallback />}>
           <UsersPage />
+        </Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/users/create',
+    element: (
+      <ProtectedRoute>
+        <Suspense fallback={<LoadingFallback />}>
+          <CreateUserPage />
+        </Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/users/:id',
+    element: (
+      <ProtectedRoute>
+        <Suspense fallback={<LoadingFallback />}>
+          <UserDetailsPage />
+        </Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/users/:id/edit',
+    element: (
+      <ProtectedRoute>
+        <Suspense fallback={<LoadingFallback />}>
+          <EditUserPage />
         </Suspense>
       </ProtectedRoute>
     ),
