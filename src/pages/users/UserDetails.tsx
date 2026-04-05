@@ -152,11 +152,11 @@ export default function UserDetailsPage() {
                   Date de création
                 </label>
                 <p className="text-slate-900 dark:text-white font-medium">
-                  {format(new Date(user.createdAt), 'd MMMM yyyy', { locale: fr })}
+                  {user.createdAt ? format(new Date(user.createdAt), 'd MMMM yyyy', { locale: fr }) : 'N/A'}
                 </p>
               </div>
 
-              {user.lastLoginAt && (
+              {user.lastLoginAt ? (
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                     Dernière connexion
@@ -165,7 +165,7 @@ export default function UserDetailsPage() {
                     {format(new Date(user.lastLoginAt), 'd MMMM yyyy à HH:mm', { locale: fr })}
                   </p>
                 </div>
-              )}
+              ) : null}
             </div>
           </CardContent>
         </Card>
