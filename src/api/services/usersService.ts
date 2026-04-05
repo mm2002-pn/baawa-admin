@@ -18,7 +18,11 @@ export const usersService = {
 
   getById: async (id: string): Promise<User> => {
     const response = await apiClient.get(`/users/${id}`)
-    return response as unknown as User
+    console.log('📊 getById response:', response)
+
+    // Handle both wrapped and direct responses
+    const userData = response.data || response
+    return userData as unknown as User
   },
 
   create: async (data: CreateUserDto): Promise<User> => {
