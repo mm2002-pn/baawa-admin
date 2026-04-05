@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -21,10 +21,12 @@ export default function LoginPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const hasRedirected = useRef(false)
 
   // Redirect to dashboard when authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !hasRedirected.current) {
+      hasRedirected.current = true
       navigate('/', { replace: true })
     }
   }, [isAuthenticated, navigate])
