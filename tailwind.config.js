@@ -8,11 +8,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Material Design 3 Color System (BAAWA - Official POC)
-        'primary': '#0066FF',
-        'primary-dark': '#0052CC',
+        // Material Design 3 Color System (POC: baawa_centre_de_commandement_profil_connect)
+        'primary': '#3B82F6',
+        'primary-hover': '#2563EB',
+        'primary-dark': '#2563EB',
         'on-primary': '#ffffff',
-        'primary-container': '#0066FF',
+        'primary-container': '#3B82F6',
         'on-primary-container': '#86a0cd',
         'primary-fixed': '#d6e3ff',
         'primary-fixed-dim': '#adc7f7',
@@ -20,7 +21,7 @@ export default {
         'on-primary-fixed-variant': '#2d476f',
         'inverse-primary': '#adc7f7',
 
-        'secondary': '#0066FF',
+        'secondary': '#10B981',
         'on-secondary': '#ffffff',
         'secondary-container': '#6cf8bb',
         'on-secondary-container': '#00714d',
@@ -38,31 +39,31 @@ export default {
         'on-tertiary-fixed': '#2f1500',
         'on-tertiary-fixed-variant': '#6e3900',
 
-        'error': '#FF3B30',
+        'error': '#EF4444',
         'on-error': '#ffffff',
         'error-container': '#ffdad6',
         'on-error-container': '#93000a',
 
-        'background': '#faf9fd',
-        'on-background': '#1a1c1e',
-        'surface': '#faf9fd',
-        'on-surface': '#1a1c1e',
+        'background': '#F1F5F9',
+        'on-background': '#0F172A',
+        'surface': '#ffffff',
+        'on-surface': '#0F172A',
         'surface-dim': '#dad9dd',
-        'surface-bright': '#faf9fd',
+        'surface-bright': '#FFFFFF',
         'surface-container-lowest': '#ffffff',
-        'surface-container-low': '#f4f3f7',
-        'surface-container': '#efedf1',
-        'surface-container-high': '#e9e7eb',
+        'surface-container-low': '#F1F5F9',
+        'surface-container': '#F8FAFC',
+        'surface-container-high': '#E2E8F0',
         'surface-container-highest': '#e3e2e6',
-        'surface-variant': '#e3e2e6',
-        'on-surface-variant': '#43474e',
+        'surface-variant': '#E2E8F0',
+        'on-surface-variant': '#64748B',
 
-        'outline': '#74777f',
+        'outline': '#E2E8F0',
         'outline-variant': '#c4c6cf',
 
         'inverse-surface': '#2f3033',
         'inverse-on-surface': '#f1f0f4',
-        'surface-tint': '#455f88',
+        'surface-tint': '#3B82F6',
       },
       fontFamily: {
         headline: ['Montserrat', 'Manrope', 'sans-serif'],

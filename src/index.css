@@ -94,6 +94,20 @@ body {
   background-color: #94a3b8;
 }
 
+/* Custom scrollbar for specific elements */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 10px;
+}
+
 dark ::-webkit-scrollbar-track {
   background-color: #1e293b;
 }
