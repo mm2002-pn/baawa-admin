@@ -188,7 +188,7 @@ export default function DashboardPage() {
               to={item.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all duration-200 ${
                 isActive(item.href)
-                  ? 'bg-primary/10 text-primary'
+                  ? 'bg-blue-600/10 text-blue-600'
                   : 'text-slate-500 hover:bg-slate-50'
               }`}
             >
@@ -200,7 +200,7 @@ export default function DashboardPage() {
 
         {/* Footer Actions */}
         <div className="mt-auto space-y-4">
-          <button className="w-full py-3.5 px-4 bg-primary text-white rounded-lg font-bold text-sm shadow-lg shadow-primary/20 flex items-center justify-center gap-2 hover:bg-primary-hover transition-all">
+          <button className="w-full py-3.5 px-4 bg-blue-600 text-white rounded-lg font-bold text-sm shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:bg-blue-700 transition-all">
             <span className="material-symbols-outlined text-lg">add_alert</span>
             Signaler une disparition
           </button>
@@ -243,7 +243,7 @@ export default function DashboardPage() {
 
             <div className="flex items-center gap-4">
               {/* Notifications */}
-              <button className="p-2.5 text-slate-400 hover:bg-slate-50 hover:text-primary rounded-full transition-all relative">
+              <button className="p-2.5 text-slate-400 hover:bg-slate-50 hover:text-blue-600 rounded-full transition-all relative">
                 <span className="material-symbols-outlined">notifications</span>
                 <span className="absolute top-2 right-2 h-2.5 w-2.5 bg-error rounded-full border-2 border-white"></span>
               </button>
@@ -263,12 +263,12 @@ export default function DashboardPage() {
                 <span className="text-sm font-extrabold text-slate-900 leading-none mb-0.5" style={{ fontFamily: "'Manrope', sans-serif" }}>
                   {user?.firstName} {user?.lastName}
                 </span>
-                <span className="text-[10px] font-bold text-primary uppercase tracking-wider leading-none" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider leading-none" style={{ fontFamily: "'Inter', sans-serif" }}>
                   Superviseure Senior
                 </span>
               </div>
 
-              <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-white shadow-md ring-1 ring-slate-200 bg-primary flex items-center justify-center text-white font-bold">
+              <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-white shadow-md ring-1 ring-slate-200 bg-blue-600 flex items-center justify-center text-white font-bold">
                 {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
               </div>
             </div>
@@ -395,7 +395,7 @@ export default function DashboardPage() {
                 <button className="bg-white p-2.5 rounded-lg shadow-lg  hover:bg-slate-50 text-slate-700 transition-all">
                   <span className="material-symbols-outlined">remove</span>
                 </button>
-                <button className="bg-white p-2.5 rounded-lg shadow-lg  hover:bg-primary hover:text-white text-slate-700 transition-all">
+                <button className="bg-white p-2.5 rounded-lg shadow-lg  hover:bg-blue-600 hover:text-white text-slate-700 transition-all">
                   <span className="material-symbols-outlined">my_location</span>
                 </button>
               </div>
@@ -408,7 +408,7 @@ export default function DashboardPage() {
                   Filtres :
                 </span>
                 <div className="flex gap-2">
-                  <span className="bg-primary text-white px-4 py-1.5 rounded-full text-[10px] font-extrabold cursor-pointer">
+                  <span className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-extrabold cursor-pointer">
                     Tout voir
                   </span>
                   <span className="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-[10px] font-extrabold hover:bg-slate-200 cursor-pointer transition-all">
@@ -439,7 +439,7 @@ export default function DashboardPage() {
                   </span>
                   Alertes Critiques ({criticalAlerts.length})
                 </h3>
-                <a href="#" className="text-[10px] font-extrabold text-primary hover:underline uppercase tracking-wider">
+                <a href="#" className="text-[10px] font-extrabold text-blue-600 hover:underline uppercase tracking-wider">
                   Voir tout
                 </a>
               </div>
@@ -485,12 +485,12 @@ export default function DashboardPage() {
               </div>
               <div className="flex justify-between items-center mb-6 relative z-10">
                 <h3 className="text-sm font-extrabold font-montserrat flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-xl">
+                  <span className="material-symbols-outlined text-blue-600 text-xl">
                     broadcast_on_home
                   </span>
                   Flux Opérations
                 </h3>
-                <span className="text-[10px] font-extrabold bg-primary/20 text-primary px-3 py-1 rounded-full border border-primary/30">
+                <span className="text-[10px] font-extrabold bg-blue-600/20 text-blue-600 px-3 py-1 rounded-full border border-blue-600/30">
                   24 NOUVEAUX
                 </span>
               </div>
@@ -499,19 +499,19 @@ export default function DashboardPage() {
                   <div
                     key={idx}
                     className={`border-l-2 pl-5 py-0.5 relative ${
-                      item.priority === 'high' ? 'border-primary/30' : 'border-white/10'
+                      item.priority === 'high' ? 'border-blue-600/30' : 'border-white/10'
                     }`}
                   >
                     <div
                       className={`absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full ${
                         item.priority === 'high'
-                          ? 'bg-primary shadow-[0_0_12px_rgba(59,130,246,0.6)]'
+                          ? 'bg-blue-600 shadow-[0_0_12px_rgba(59,130,246,0.6)]'
                           : 'bg-slate-700'
                       }`}
                     ></div>
                     <p
                       className={`text-[10px] font-extrabold uppercase tracking-wider ${
-                        item.priority === 'high' ? 'text-primary' : 'text-slate-500'
+                        item.priority === 'high' ? 'text-blue-600' : 'text-slate-500'
                       }`}
                     >
                       {item.time}
@@ -526,7 +526,7 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-              <button className="mt-6 w-full py-3 bg-primary hover:bg-primary-hover text-white rounded-lg text-xs font-extrabold transition-all shadow-lg shadow-primary/20">
+              <button className="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-extrabold transition-all shadow-lg shadow-blue-600/20">
                 Ouvrir le terminal complet
               </button>
             </div>
@@ -539,10 +539,10 @@ export default function DashboardPage() {
                 Dernières Retrouvailles
               </h3>
               <div className="flex gap-3">
-                <button className="p-2.5 bg-white  rounded-lg text-slate-500 hover:text-primary hover:border-primary transition-all">
+                <button className="p-2.5 bg-white  rounded-lg text-slate-500 hover:text-blue-600 hover:border-blue-600 transition-all">
                   <span className="material-symbols-outlined text-sm">chevron_left</span>
                 </button>
-                <button className="p-2.5 bg-white  rounded-lg text-slate-500 hover:text-primary hover:border-primary transition-all">
+                <button className="p-2.5 bg-white  rounded-lg text-slate-500 hover:text-blue-600 hover:border-blue-600 transition-all">
                   <span className="material-symbols-outlined text-sm">chevron_right</span>
                 </button>
               </div>
@@ -551,7 +551,7 @@ export default function DashboardPage() {
               {recentSuccesses.map((success, idx) => (
                 <div
                   key={idx}
-                  className="bg-white p-5 rounded-lg shadow-sm  flex items-center gap-5 group hover:shadow-md hover:border-primary/20 transition-all cursor-pointer"
+                  className="bg-white p-5 rounded-lg shadow-sm  flex items-center gap-5 group hover:shadow-md hover:border-blue-600/20 transition-all cursor-pointer"
                 >
                   <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0 relative ring-2 ring-slate-100">
                     <img alt={success.name} className="h-full w-full object-cover" src={success.image} />
@@ -579,7 +579,7 @@ export default function DashboardPage() {
       </main>
 
       {/* Float FAB */}
-      <button className="fixed bottom-10 right-10 h-16 w-16 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 group hover:bg-primary-hover ring-4 ring-primary/20">
+      <button className="fixed bottom-10 right-10 h-16 w-16 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 group hover:bg-blue-700 ring-4 ring-blue-600/20">
         <span className="material-symbols-outlined text-3xl">add</span>
         <span className="absolute right-full mr-6 bg-slate-900 text-white px-5 py-3 rounded-lg text-sm font-extrabold opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap shadow-xl">
           Signaler une disparition
