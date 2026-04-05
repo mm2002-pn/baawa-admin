@@ -281,7 +281,7 @@ export default function DashboardPage() {
           {/* KPI Cards */}
           <div className="col-span-12 grid grid-cols-4 gap-6">
             {kpis.map((kpi) => (
-              <div key={kpi.label} className="bg-white p-6 rounded-lg border border-outline shadow-sm flex flex-col justify-between">
+              <div key={kpi.label} className="bg-white p-6 rounded-lg  shadow-sm flex flex-col justify-between">
                 <div className="flex justify-between items-start">
                   <div className="p-3 bg-secondary/10 rounded-lg" style={{
                     backgroundColor: kpi.icon === 'handshake' ? '#10B981' + '15' :
@@ -326,10 +326,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Map Section & Right Panel */}
-          <div className="col-span-8 bg-white rounded-lg border border-outline shadow-sm relative overflow-hidden h-[620px]">
+          <div className="col-span-8 bg-white rounded-lg  shadow-sm relative overflow-hidden h-[620px]">
             {/* Map Legend */}
             <div className="absolute top-6 left-6 z-10 space-y-4">
-              <div className="bg-white/95 backdrop-blur-md p-4 rounded-lg shadow-xl border border-outline">
+              <div className="bg-white/95 backdrop-blur-md p-4 rounded-lg shadow-xl ">
                 <h4 className="text-[10px] font-extrabold font-montserrat text-slate-400 uppercase tracking-widest mb-3">
                   Légende
                 </h4>
@@ -390,13 +390,13 @@ export default function DashboardPage() {
 
               {/* Map Controls */}
               <div className="absolute bottom-10 right-6 flex flex-col gap-3">
-                <button className="bg-white p-2.5 rounded-lg shadow-lg border border-outline hover:bg-slate-50 text-slate-700 transition-all">
+                <button className="bg-white p-2.5 rounded-lg shadow-lg  hover:bg-slate-50 text-slate-700 transition-all">
                   <span className="material-symbols-outlined">add</span>
                 </button>
-                <button className="bg-white p-2.5 rounded-lg shadow-lg border border-outline hover:bg-slate-50 text-slate-700 transition-all">
+                <button className="bg-white p-2.5 rounded-lg shadow-lg  hover:bg-slate-50 text-slate-700 transition-all">
                   <span className="material-symbols-outlined">remove</span>
                 </button>
-                <button className="bg-white p-2.5 rounded-lg shadow-lg border border-outline hover:bg-primary hover:text-white text-slate-700 transition-all">
+                <button className="bg-white p-2.5 rounded-lg shadow-lg  hover:bg-primary hover:text-white text-slate-700 transition-all">
                   <span className="material-symbols-outlined">my_location</span>
                 </button>
               </div>
@@ -429,7 +429,7 @@ export default function DashboardPage() {
           {/* Right Panel */}
           <div className="col-span-4 flex flex-col gap-8 h-[620px]">
             {/* Critical Alerts */}
-            <div className="bg-white rounded-lg border border-outline shadow-sm p-6 flex flex-col overflow-hidden max-h-[300px]">
+            <div className="bg-white rounded-lg  shadow-sm p-6 flex flex-col overflow-hidden max-h-[300px]">
               <div className="flex justify-between items-center mb-5">
                 <h3 className="text-sm font-extrabold font-montserrat text-slate-900 flex items-center gap-2">
                   <span
@@ -448,7 +448,7 @@ export default function DashboardPage() {
                 {criticalAlerts.map((alert) => (
                   <div
                     key={alert.id}
-                    className={`p-4 rounded-lg border-l-4 flex gap-4 group hover:bg-opacity-50 transition-all cursor-pointer ${
+                    className={`p-4 rounded-lg flex gap-4 group hover:bg-opacity-50 transition-all cursor-pointer ${
                       alert.priority === 'critical'
                         ? 'bg-red-50/50 border-error'
                         : 'bg-slate-50 border-orange-500'
@@ -540,10 +540,10 @@ export default function DashboardPage() {
                 Dernières Retrouvailles
               </h3>
               <div className="flex gap-3">
-                <button className="p-2.5 bg-white border border-outline rounded-lg text-slate-500 hover:text-primary hover:border-primary transition-all">
+                <button className="p-2.5 bg-white  rounded-lg text-slate-500 hover:text-primary hover:border-primary transition-all">
                   <span className="material-symbols-outlined text-sm">chevron_left</span>
                 </button>
-                <button className="p-2.5 bg-white border border-outline rounded-lg text-slate-500 hover:text-primary hover:border-primary transition-all">
+                <button className="p-2.5 bg-white  rounded-lg text-slate-500 hover:text-primary hover:border-primary transition-all">
                   <span className="material-symbols-outlined text-sm">chevron_right</span>
                 </button>
               </div>
@@ -552,7 +552,7 @@ export default function DashboardPage() {
               {recentSuccesses.map((success, idx) => (
                 <div
                   key={idx}
-                  className="bg-white p-5 rounded-lg shadow-sm border border-outline flex items-center gap-5 group hover:shadow-md hover:border-primary/20 transition-all cursor-pointer"
+                  className="bg-white p-5 rounded-lg shadow-sm  flex items-center gap-5 group hover:shadow-md hover:border-primary/20 transition-all cursor-pointer"
                 >
                   <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0 relative ring-2 ring-slate-100">
                     <img alt={success.name} className="h-full w-full object-cover" src={success.image} />
