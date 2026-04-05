@@ -254,7 +254,7 @@ export default function DashboardPage() {
               </button>
 
               {/* Emergency */}
-              <button className="bg-error text-white px-6 py-2.5 rounded-lg text-sm font-extrabold hover:bg-red-700 shadow-lg shadow-error/30 transition-all active:scale-95">
+              <button className="bg-red-600 text-white px-6 py-2.5 rounded-lg text-sm font-extrabold hover:bg-red-700 shadow-lg shadow-red-600/40 transition-all active:scale-95">
                 🚨 Emergency
               </button>
 
