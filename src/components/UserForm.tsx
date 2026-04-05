@@ -173,10 +173,31 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
       )}
 
       {/* Submit Button */}
-      <div className="flex gap-2">
-        <Button type="submit" isLoading={isLoading} className="flex-1">
-          {isEditing ? 'Mettre à jour' : 'Créer'}
-        </Button>
+      <div className="flex gap-2 pt-4">
+        <button
+          type="submit"
+          disabled={isLoading}
+          style={{
+            width: '100%',
+            padding: '10px 16px',
+            backgroundColor: '#1E69FF',
+            color: 'white',
+            fontWeight: '500',
+            borderRadius: '8px',
+            border: 'none',
+            cursor: isLoading ? 'not-allowed' : 'pointer',
+            opacity: isLoading ? 0.6 : 1,
+            fontSize: '16px',
+          }}
+          onMouseEnter={(e) => {
+            if (!isLoading) e.currentTarget.style.backgroundColor = '#0052CC'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#1E69FF'
+          }}
+        >
+          {isLoading ? 'Sauvegarde...' : isEditing ? 'Mettre à jour' : 'Créer'}
+        </button>
       </div>
     </form>
   )
