@@ -21,7 +21,11 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
     reset,
   } = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      ...initialData,
+      // Set default phone prefix for new users
+      phoneNumber: initialData?.phoneNumber || '+221 ',
+    },
   })
 
   useEffect(() => {
@@ -87,10 +91,10 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
           type="tel"
           {...register('phoneNumber')}
           className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
-          placeholder="+221 77 123 45 67"
+          placeholder="+221 77 123 4567"
         />
         {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber.message}</p>}
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Format: +221 [679]XXXXXXXX</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Format: +221 [679]XXXXXXXX (9 chiffres après l'indicatif)</p>
       </div>
 
       {/* Role Selection */}

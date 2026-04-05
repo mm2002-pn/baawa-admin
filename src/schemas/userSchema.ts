@@ -8,7 +8,7 @@ const baseUserSchema = z.object({
   lastName: z.string().min(2, 'Le nom doit faire au moins 2 caractères'),
   phoneNumber: z
     .string()
-    .regex(/^\+221\s?[679]\d{7}$/, 'Numéro de téléphone sénégalais invalide (+221 format)'),
+    .regex(/^\+221\s?[679]\d{8}$/, 'Numéro de téléphone sénégalais invalide (format: +221 77 123 45 67)'),
   role: z.nativeEnum(Role),
   zoneGeo: z.string().optional(),
   // Officer fields (shown if role is POLICIER)
