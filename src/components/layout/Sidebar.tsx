@@ -82,7 +82,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex items-center gap-2 px-6 py-6 border-b border-slate-200 dark:border-slate-700">
-          <div className="h-8 w-8 rounded-lg bg-primary-500 flex items-center justify-center text-white font-bold">
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold">
             BA
           </div>
           <div>

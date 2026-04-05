@@ -188,7 +188,7 @@ export default function UsersListPage() {
                     setSearch(e.target.value)
                     setPage(1)
                   }}
-                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
 
@@ -202,7 +202,7 @@ export default function UsersListPage() {
                     setSelectedRole(e.target.value)
                     setPage(1)
                   }}
-                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Tous les rôles</option>
                   <option value={Role.CITOYEN}>Citoyen</option>
@@ -221,7 +221,7 @@ export default function UsersListPage() {
                     setSelectedStatus(e.target.value)
                     setPage(1)
                   }}
-                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Tous les statuts</option>
                   <option value="active">Actif</option>

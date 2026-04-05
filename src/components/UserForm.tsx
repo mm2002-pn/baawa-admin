@@ -46,7 +46,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
         <input
           type="email"
           {...register('email')}
-          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
           placeholder="utilisateur@example.com"
           disabled={isEditing}
         />
@@ -62,7 +62,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
           <input
             type="text"
             {...register('firstName')}
-            className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+            className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
             placeholder="Jean"
           />
           {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>}
@@ -75,7 +75,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
           <input
             type="text"
             {...register('lastName')}
-            className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+            className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
             placeholder="Diallo"
           />
           {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>}
@@ -90,7 +90,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
         <input
           type="tel"
           {...register('phoneNumber')}
-          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
           placeholder="+221 77 123 4567"
         />
         {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber.message}</p>}
@@ -104,7 +104,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
         </label>
         <select
           {...register('role')}
-          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
         >
           <option value="">Sélectionner un rôle</option>
           <option value={Role.CITOYEN}>Citoyen</option>
@@ -122,7 +122,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
         <input
           type="text"
           {...register('zoneGeo')}
-          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
           placeholder="Dakar, Thiès, etc."
         />
         {errors.zoneGeo && <p className="text-red-500 text-sm mt-1">{errors.zoneGeo.message}</p>}
@@ -141,7 +141,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
               <input
                 type="text"
                 {...register('badgeNumber')}
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
                 placeholder="BP-2024-001"
               />
               {errors.badgeNumber && <p className="text-red-500 text-sm mt-1">{errors.badgeNumber.message}</p>}
@@ -154,7 +154,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
               <input
                 type="text"
                 {...register('rank')}
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
                 placeholder="Commandant"
               />
               {errors.rank && <p className="text-red-500 text-sm mt-1">{errors.rank.message}</p>}
@@ -167,7 +167,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
               <input
                 type="text"
                 {...register('policeUnit')}
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
                 placeholder="Commissariat Central de Dakar"
               />
               {errors.policeUnit && <p className="text-red-500 text-sm mt-1">{errors.policeUnit.message}</p>}
@@ -184,7 +184,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
           style={{
             width: '100%',
             padding: '10px 16px',
-            backgroundColor: '#1E69FF',
+            backgroundColor: '#0066FF',
             color: 'white',
             fontWeight: '500',
             borderRadius: '8px',
@@ -197,7 +197,7 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
             if (!isLoading) e.currentTarget.style.backgroundColor = '#0052CC'
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#1E69FF'
+            e.currentTarget.style.backgroundColor = '#0066FF'
           }}
         >
           {isLoading ? 'Sauvegarde...' : isEditing ? 'Mettre à jour' : 'Créer'}

@@ -31,7 +31,7 @@ export default function UserDetailsPage() {
     return (
       <AdminLayout>
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
       </AdminLayout>
     )
@@ -174,21 +174,21 @@ export default function UserDetailsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-3xl font-bold text-primary-500">0</div>
+              <div className="text-3xl font-bold text-primary">0</div>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">Signalements créés</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-3xl font-bold text-primary-500">0</div>
+              <div className="text-3xl font-bold text-primary">0</div>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">Pistes soumises</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-3xl font-bold text-primary-500">0</div>
+              <div className="text-3xl font-bold text-primary">0</div>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">Pistes vérifiées</p>
             </CardContent>
           </Card>

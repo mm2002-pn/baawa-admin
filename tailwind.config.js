@@ -8,10 +8,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Material Design 3 Color System (BAAWA)
-        'primary': '#002045',
+        // Material Design 3 Color System (BAAWA - Official POC)
+        'primary': '#0066FF',
+        'primary-dark': '#0052CC',
         'on-primary': '#ffffff',
-        'primary-container': '#1a365d',
+        'primary-container': '#0066FF',
         'on-primary-container': '#86a0cd',
         'primary-fixed': '#d6e3ff',
         'primary-fixed-dim': '#adc7f7',
@@ -19,7 +20,7 @@ export default {
         'on-primary-fixed-variant': '#2d476f',
         'inverse-primary': '#adc7f7',
 
-        'secondary': '#006c49',
+        'secondary': '#0066FF',
         'on-secondary': '#ffffff',
         'secondary-container': '#6cf8bb',
         'on-secondary-container': '#00714d',
@@ -37,7 +38,7 @@ export default {
         'on-tertiary-fixed': '#2f1500',
         'on-tertiary-fixed-variant': '#6e3900',
 
-        'error': '#ba1a1a',
+        'error': '#FF3B30',
         'on-error': '#ffffff',
         'error-container': '#ffdad6',
         'on-error-container': '#93000a',

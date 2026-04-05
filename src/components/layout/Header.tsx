@@ -51,7 +51,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               onClick={() => setShowUserMenu(!showUserMenu)}
               className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
             >
-              <div className="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center text-white text-sm font-semibold">
+              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-semibold">
                 {user?.firstName?.charAt(0)}
               </div>
               <div className="hidden sm:block text-sm font-medium text-slate-900 dark:text-white">
