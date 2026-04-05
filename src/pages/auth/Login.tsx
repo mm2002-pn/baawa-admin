@@ -147,7 +147,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full text-white font-headline font-bold py-4 rounded-lg shadow-lg active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group bg-blue-600 hover:bg-blue-700 shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full text-white font-headline font-bold py-4 rounded-lg shadow-lg active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group bg-primary hover:bg-primary-dark shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>{isLoading ? 'Connexion en cours...' : 'Se connecter'}</span>
               {!isLoading && (
