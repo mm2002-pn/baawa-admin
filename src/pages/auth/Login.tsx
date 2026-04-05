@@ -17,7 +17,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const { setAuth } = useAuthStore()
+  const setAuth = useAuthStore((state) => state.setAuth)
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -27,6 +27,13 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    shouldFocusError: false,
   })
 
   const onSubmit = async (data: LoginFormData) => {
@@ -35,11 +42,12 @@ export default function LoginPage() {
       const response = await authService.login(data)
 
       setAuth(response.user, response.accessToken, response.refreshToken)
-
       toast.success('Connexion réussie!')
       navigate('/')
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erreur lors de la connexion')
+      console.error('Login error:', error)
+      const message = error.response?.data?.message || 'Erreur lors de la connexion'
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }
@@ -94,13 +102,30 @@ export default function LoginPage() {
             </div>
 
             {/* Submit Button */}
-            <Button
+            <button
               type="submit"
-              isLoading={isLoading}
-              className="w-full mt-6"
+              disabled={isLoading}
+              style={{
+                width: '100%',
+                marginTop: '24px',
+                padding: '8px 16px',
+                backgroundColor: '#1E69FF',
+                color: 'white',
+                fontWeight: '500',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                opacity: isLoading ? 0.5 : 1,
+              }}
+              onMouseEnter={(e) => {
+                if (!isLoading) e.currentTarget.style.backgroundColor = '#0052CC'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E69FF'
+              }}
             >
-              Se connecter
-            </Button>
+              {isLoading ? 'Connexion...' : 'Se connecter'}
+            </button>
           </form>
 
           {/* Footer */}

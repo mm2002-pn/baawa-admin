@@ -3,8 +3,13 @@ import { LoginCredentials, AuthResponse, User } from '../types'
 
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await apiClient.post('/auth/classic-login', credentials)
-    return response as unknown as AuthResponse
+    try {
+      const response = await apiClient.post('/auth/classic-login', credentials)
+      return response as unknown as AuthResponse
+    } catch (error) {
+      console.error('Login error:', error)
+      throw error
+    }
   },
 
   logout: async (): Promise<void> => {

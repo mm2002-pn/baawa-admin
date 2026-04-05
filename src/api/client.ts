@@ -11,71 +11,54 @@ export const apiClient: AxiosInstance = axios.create({
   withCredentials: false,
 })
 
-// Request interceptor: Add Authorization header
+// Request interceptor - Add Authorization token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const { accessToken } = useAuthStore.getState()
-
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`
     }
-
     return config
   },
   (error: AxiosError) => {
+    console.error('❌ Request interceptor error:', error)
     return Promise.reject(error)
   }
 )
 
-// Response interceptor: Handle auth errors and auto refresh
+// Response interceptor - Handle errors and token refresh
 apiClient.interceptors.response.use(
   (response) => {
-    // Return only data from response
     return response.data as any
   },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
 
-    // Handle 401 Unauthorized - try to refresh token
+    // If 401 and haven't retried yet, try to refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
       try {
         const { refreshToken } = useAuthStore.getState()
+        if (refreshToken) {
+          // Try to refresh the token
+          const response = await axios.post(`${baseURL}/auth/refresh`, {
+            refreshToken,
+          })
 
-        if (!refreshToken) {
-          throw new Error('No refresh token available')
+          const { accessToken: newAccessToken } = response.data
+          useAuthStore.getState().setAccessToken(newAccessToken)
+
+          // Retry original request
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
+          return apiClient(originalRequest)
         }
-
-        // Call refresh token endpoint
-        const refreshResponse = await axios.post(`${baseURL}/auth/refresh`, {
-          refreshToken,
-        })
-
-        const { accessToken: newAccessToken } = refreshResponse.data
-
-        // Update store with new token
-        useAuthStore.setState({ accessToken: newAccessToken })
-
-        // Retry original request with new token
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
-        return apiClient(originalRequest)
       } catch (refreshError) {
         // Refresh failed, logout user
         useAuthStore.getState().logout()
-        window.location.href = '/login'
-        return Promise.reject(refreshError)
+        // Optionally redirect to login - but use proper routing, not window.location
+        // The ProtectedRoute component will handle this
       }
-    }
-
-    // Handle 403 Forbidden - user doesn't have permission
-    if (error.response?.status === 403) {
-      console.error('Access denied - insufficient permissions')
-    }
-
-    // Handle network errors
-    if (!error.response) {
-      console.error('Network error:', error.message)
     }
 
     return Promise.reject(error)
