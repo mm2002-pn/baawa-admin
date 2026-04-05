@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -18,18 +18,8 @@ type LoginFormData = z.infer<typeof loginSchema>
 export default function LoginPage() {
   const navigate = useNavigate()
   const setAuth = useAuthStore((state) => state.setAuth)
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
-  const hasRedirected = useRef(false)
-
-  // Redirect to dashboard when authenticated
-  useEffect(() => {
-    if (isAuthenticated && !hasRedirected.current) {
-      hasRedirected.current = true
-      navigate('/', { replace: true })
-    }
-  }, [isAuthenticated, navigate])
 
   const {
     register,
@@ -51,10 +41,14 @@ export default function LoginPage() {
       setIsLoading(true)
       const response = await authService.login(data)
 
-      // Set auth in store - this will trigger the useEffect which navigates
+      // Set auth in store
       setAuth(response.user, response.accessToken, response.refreshToken)
       toast.success('Connexion réussie!')
-      // Don't navigate here - let the useEffect handle it
+
+      // Navigate to dashboard - use setTimeout to ensure store is updated
+      setTimeout(() => {
+        navigate('/', { replace: true })
+      }, 100)
     } catch (error: any) {
       console.error('Login error:', error)
       const message = error.response?.data?.message || 'Erreur lors de la connexion'
