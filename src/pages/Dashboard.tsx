@@ -1,322 +1,429 @@
 import { useState } from 'react'
+import { AdminLayout } from '../components/layout/AdminLayout'
+
+interface KPICard {
+  label: string
+  value: string | number
+  trend: string
+  icon: string
+  bgColor: string
+  textColor: string
+}
+
+interface CriticalAlert {
+  id: number
+  name: string
+  age: number
+  location: string
+  elapsed: string
+  image: string
+  priority: 'critical' | 'warning'
+}
+
+interface SuccessCase {
+  name: string
+  location: string
+  time: string
+  image: string
+}
 
 export default function DashboardPage() {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery] = useState('')
 
-  const stats = [
-    { label: 'Sûr', value: '3', textColor: '#0066FF', bgColor: '#0066FF1a' },
-    { label: 'Zone Étendue', value: '1', textColor: '#eb851c', bgColor: '#eb851c1a' },
-    { label: 'Alerte', value: '1', textColor: '#FF3B30', bgColor: '#FF3B301a' },
+  // KPI Statistics
+  const kpis: KPICard[] = [
+    {
+      label: 'Retrouvailles totales',
+      value: '1,428',
+      trend: '+12%',
+      icon: 'handshake',
+      bgColor: '#10B981',
+      textColor: '#10B981',
+    },
+    {
+      label: 'Recherches actives',
+      value: '142',
+      trend: '8 Actifs',
+      icon: 'search_insights',
+      bgColor: '#0066FF',
+      textColor: '#0066FF',
+    },
+    {
+      label: 'Temps de réponse',
+      value: '18 min',
+      trend: '-4m',
+      icon: 'timer',
+      bgColor: '#F59E0B',
+      textColor: '#D97706',
+    },
+    {
+      label: 'Évolution hebdo',
+      value: '+24.5%',
+      trend: '📈',
+      icon: 'trending_up',
+      bgColor: '#0066FF',
+      textColor: '#0066FF',
+    },
   ]
 
-  const members = [
+  // Critical Alerts
+  const criticalAlerts: CriticalAlert[] = [
     {
       id: 1,
-      name: 'Papa Samba',
-      relationship: 'Grand-père',
-      location: 'Terminal du Ferry de Gorée',
-      status: 'sos',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBwUQVOh2rgw4UswhDIOtd76iU4UaiCyRXqzPwGmcLv6vCSSS9Dc_C9FGNor5NrKX8Swljoz1Y7g2aV4tSXMSh5Pv35T5gpAz7m8M8cctK4jVOpWXCcQVvQkl_H44mBpI66XMLwadMquN9UTIA1Lt0b55UP-RYaOw0BI3zwXl8bmTq5TTZV7rkkuDcWgdpbg2dw-SvLbMjeu4LwWdz1VI0xh0SbO2inSHuKWgMQk_NUvc7h3wNsiU3U2YF782d4EXudzWFDwP5l8xs3',
+      name: 'Amina Sow',
+      age: 7,
+      location: 'Parcelles Assainies, Dakar',
+      elapsed: '2h écoulées',
+      image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1',
+      priority: 'critical',
     },
     {
       id: 2,
-      name: 'Moussa',
-      relationship: 'Fils • Université',
-      battery: 82,
-      status: 'safe',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC23NJTJ6Kqvd5KDOXdEo3ou3nvkNyomdnel-FQOqJS07eHKU9e18m-r8KDr_mCvQ8LJmKEdb2CMtKTQH_T8RsnMA4mJZTFFgCUiC_wSjdNiLiq_5ED8sQD8MslxuZK7MfJzjsoLpib9AB6exNo_9lzj00YqPV0d0Sc4PZT3lXGxK17P_dACJlKgR2Yr7B9exHXbL7MSY_MqEvGQsFNdKAUdoAoeVUzi7KMhgneWouEUsGxA6v6aIjZr3qIaidaF5G4952ri-Dl_edZ',
+      name: 'Ibrahima Diallo',
+      age: 68,
+      location: 'Mbour 1, Thiès',
+      elapsed: '5h écoulées',
+      image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2',
+      priority: 'warning',
+    },
+  ]
+
+  // Recent Successes
+  const recentSuccesses: SuccessCase[] = [
+    {
+      name: 'Moussa Ndiaye',
+      location: 'Retrouvé à Kaolack',
+      time: 'Il y a 4 heures',
+      image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3',
     },
     {
-      id: 3,
-      name: 'Awa',
-      relationship: 'Fille • École',
-      location: 'Hors de la zone scolaire depuis 15 mins',
-      status: 'away',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD9CCNPXtDHpwn8e_iPs_do7S4WUkGzCtoMU0kYShhMQS-1xOokTb2KH5uUfglOBY-eBjejBPwpP1rLCSykPk3ecIPsJ2W1cRrn90T-LXfM1Mw0bbG_7WfrS0VusNSOOPUszTKBE7LAqm7hpcIy_FbKQeQ05XGzJuwHYGqzTDO07OL4T5Muo7VRuOgG2rbVKQ4qMe2zIVSuAXRLg14IHUP7ZiYnRbPyZ9owISTC86ZJLG-P8IeqIZGLeD6hxVjK_yXouKInACE1AInp',
+      name: 'Seynabou Gueye',
+      location: 'Retrouvée à Dakar',
+      time: 'Il y a 6 heures',
+      image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=4',
+    },
+    {
+      name: 'Pathé Sarr',
+      location: 'Retrouvé à Thiès',
+      time: 'Il y a 8 heures',
+      image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=5',
+    },
+    {
+      name: 'Khady Diop',
+      location: 'Retrouvée à Touba',
+      time: 'Il y a 10 heures',
+      image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=6',
+    },
+  ]
+
+  // Operations Live Feed
+  const operationsFeed = [
+    {
+      time: 'À l\'instant',
+      message: 'Unité Mobile #04 déployée à Grand Yoff.',
+      priority: 'high',
+    },
+    {
+      time: 'Il y a 3 min',
+      message: 'Nouveau signalement reçu : Zone Touba Mbacké.',
+      priority: 'normal',
+    },
+    {
+      time: 'Il y a 12 min',
+      message: 'RECONNAISSANCE FACIALE POSITIVE : Dossier #2284.',
+      priority: 'high',
+    },
+    {
+      time: 'Il y a 15 min',
+      message: 'Clôture du dossier #2241 (Retrouvailles confirmées).',
+      priority: 'normal',
     },
   ]
 
   return (
-    <div className="h-screen bg-background overflow-hidden flex flex-col md:flex-row">
-      {/* Top Navigation Bar */}
-      <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm dark:shadow-none h-16 flex justify-between items-center px-8">
-        <div className="flex items-center gap-8">
-          <div className="h-10 w-auto flex items-center font-headline font-bold text-2xl text-primary">
-            BA
-          </div>
-          <div className="hidden md:flex gap-6 items-center">
-            <a className="font-headline text-sm font-medium transition-colors dark:text-blue-400 border-b-2 pb-1 text-primary border-primary" href="#">
-              Tableau de Bord
-            </a>
-            <a className="font-headline text-sm font-medium transition-colors text-slate-500 dark:text-slate-400 hover:text-blue-700" href="#">
-              Carte
-            </a>
-            <a className="font-headline text-sm font-medium transition-colors text-slate-500 dark:text-slate-400 hover:text-blue-700" href="#">
-              Alertes
-            </a>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="relative group">
-            <span className="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 rounded-full hover:bg-surface-container-high transition-colors">
-              notifications
-            </span>
-            <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
-          </div>
-          <span className="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 rounded-full hover:bg-surface-container-high transition-colors">
-            settings
-          </span>
-          <button className="bg-primary text-white px-4 py-2 rounded-lg font-headline text-sm font-bold active:scale-95 duration-150 shadow-lg shadow-primary/20">
-            Nouveau Signalement
-          </button>
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-highest bg-primary flex items-center justify-center text-white font-bold">
-            A
-          </div>
-        </div>
-      </header>
-
-      {/* Side Navigation Bar */}
-      <aside className="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-slate-50 dark:bg-slate-950 flex flex-col p-4 z-40 transition-all duration-200 ease-in-out border-r border-transparent md:flex hidden">
-        <div className="mb-8 px-4">
-          <h2 className="text-blue-900 dark:text-blue-50 font-headline font-bold text-lg">Tableau de Bord</h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest">Gestion des Signalements</p>
-        </div>
-        <nav className="flex-1 space-y-2">
-          <a className="text-blue-700 dark:text-blue-300 font-bold flex items-center gap-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 transition-all duration-200" href="#">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-              map
-            </span>
-            <span className="font-headline">Carte Tactique</span>
-          </a>
-          <a className="text-slate-600 dark:text-slate-400 flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition-all duration-200" href="#">
-            <span className="material-symbols-outlined">group</span>
-            <span className="font-headline">Signalements</span>
-          </a>
-          <a className="text-slate-600 dark:text-slate-400 flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition-all duration-200" href="#">
-            <span className="material-symbols-outlined">notifications_active</span>
-            <span className="font-headline">Alertes</span>
-          </a>
-          <a className="text-slate-600 dark:text-slate-400 flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition-all duration-200" href="#">
-            <span className="material-symbols-outlined">history</span>
-            <span className="font-headline">Historique</span>
-          </a>
-        </nav>
-        <div className="mt-auto space-y-4">
-          <button className="w-full bg-error text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-error/20 active:scale-[0.98] transition-transform">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-              emergency
-            </span>
-            Alerte Urgence
-          </button>
-          <a className="text-slate-600 dark:text-slate-400 flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition-all" href="#">
-            <span className="material-symbols-outlined">help</span>
-            <span className="font-headline">Centre d'aide</span>
-          </a>
-        </div>
-      </aside>
-
-      {/* Main Canvas */}
-      <main className="md:ml-64 mt-16 relative w-full h-[calc(100vh-64px)] overflow-hidden">
-        {/* Background Map */}
-        <div className="absolute inset-0 z-0">
-          <img
-            className="w-full h-full object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpsRYvD1hUOavvrvZ5qlf4ZAopYILEexQ7KRv7HsrJGmzoW46mTX-4D7M9G9jsF2Mz-AgHdDRgilIaAFE3VEplwM3TKTiWSvOy12hrJDNI_Jg59OBrv2My5tWqKOuaGW51ScjzFN6Ti_yngaib5DimzBUEyCf7bBMGMQQ-b15WIMJgDL7eYAkwwo6o0MURxioedtxRcObltycfxsPNi8pIE4UgeWoCN9sp1ZPORQJjW9P8pH7KtHZOapDgUL66zZ_01-KZeyOZLFlY"
-            alt="Mapa Dakar"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/40 to-transparent pointer-events-none"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-transparent to-background/40 pointer-events-none"></div>
-        </div>
-
-        {/* Floating Markers */}
-        <div className="absolute top-[25%] left-[35%] z-10">
-          <div className="relative flex flex-col items-center">
-            <div className="w-12 h-12 rounded-full border-4 border-secondary shadow-2xl overflow-hidden ring-4 ring-white/50">
-              <img className="w-full h-full object-cover" src={members[1].image} alt="Member safe" />
-            </div>
-            <div className="mt-2 bg-secondary text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md">
-              Zone Sûre
-            </div>
-            <div className="w-1 h-4 bg-secondary/80 rounded-full mt-1"></div>
-          </div>
-        </div>
-
-        <div className="absolute top-[45%] left-[60%] z-10">
-          <div className="relative flex flex-col items-center">
-            <div className="w-12 h-12 rounded-full border-4 border-on-tertiary-container shadow-2xl overflow-hidden ring-4 ring-white/50">
-              <img className="w-full h-full object-cover" src={members[2].image} alt="Member away" />
-            </div>
-            <div className="mt-2 bg-on-tertiary-container text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md">
-              Zone Étendue
-            </div>
-            <div className="w-1 h-4 bg-on-tertiary-container/80 rounded-full mt-1"></div>
-          </div>
-        </div>
-
-        <div className="absolute top-[70%] left-[45%] z-10">
-          <div className="relative flex flex-col items-center">
+    <AdminLayout>
+      <div className="w-full space-y-8 pb-8">
+        {/* Statistics Banner (KPIs) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {kpis.map((kpi) => (
             <div
-              className="w-12 h-12 rounded-full border-4 border-error shadow-2xl overflow-hidden ring-4 ring-white/50"
-              style={{ boxShadow: '0 0 20px rgba(255, 59, 48, 0.6)' }}
+              key={kpi.label}
+              className="bg-surface dark:bg-slate-900 p-6 rounded-lg border border-outline shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow"
             >
-              <img className="w-full h-full object-cover" src={members[0].image} alt="Member alert" />
+              <div className="flex justify-between items-start">
+                <div
+                  className="p-3 rounded-lg"
+                  style={{ backgroundColor: `${kpi.bgColor}15` }}
+                >
+                  <span
+                    className="material-symbols-outlined text-2xl"
+                    style={{ color: kpi.textColor }}
+                  >
+                    {kpi.icon}
+                  </span>
+                </div>
+                <span
+                  className="text-xs font-bold px-3 py-1 rounded-full"
+                  style={{ color: kpi.textColor, backgroundColor: `${kpi.bgColor}15` }}
+                >
+                  {kpi.trend}
+                </span>
+              </div>
+              <div className="mt-6">
+                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
+                  {kpi.label}
+                </p>
+                <h3 className="text-3xl font-bold font-headline text-on-surface mt-1 tracking-tight">
+                  {kpi.value}
+                </h3>
+              </div>
             </div>
-            <div className="mt-2 bg-error text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md">
-              Alerte SOS
+          ))}
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Map Section - Full width on mobile */}
+          <div className="lg:col-span-2 bg-surface dark:bg-slate-900 rounded-lg border border-outline shadow-sm overflow-hidden min-h-96">
+            <div className="w-full h-96 bg-surface-container-low flex items-center justify-center relative">
+              <div className="absolute inset-0 opacity-40">
+                <img
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDs4j9VqV0tfe8YnImwF3ih_XW-eRsNplG_XikyDSiVDeFchPyXgWJlGfB0G1bA80FUXa2de4axGHrclBkGBHwvY8iPBWYDYJ2KsQIeTp1CEnQozWTGPCnrDYSB_H_y_sCnBPFGeWX3lFEulb0GGCckgXHK22nEVRqnzGNGrQRRdsFr94TTWQX2TUYiP-Da1jklOdYvbhw5qOi5DL247m6AkleqR2vARMgUPkL4gj4jMrtyjpkjUGM-PrUhI1N83GWIXdfi0xsP8mzN"
+                  alt="Senegal Map"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Map Legend */}
+              <div className="absolute top-6 left-6 z-10 bg-surface/95 backdrop-blur-md p-4 rounded-lg shadow-xl border border-outline">
+                <h4 className="text-[10px] font-extrabold font-headline text-on-surface-variant uppercase tracking-widest mb-3">
+                  Légende
+                </h4>
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-3 text-xs font-semibold text-on-surface">
+                    <span className="h-2.5 w-2.5 rounded-full bg-error ring-4 ring-error/20"></span>
+                    Alerte Critique
+                  </div>
+                  <div className="flex items-center gap-3 text-xs font-semibold text-on-surface">
+                    <span className="h-2.5 w-2.5 rounded-full bg-orange-500 ring-4 ring-orange-500/20"></span>
+                    Signalement récent
+                  </div>
+                  <div className="flex items-center gap-3 text-xs font-semibold text-on-surface">
+                    <span className="h-2.5 w-2.5 rounded-full bg-secondary ring-4 ring-secondary/20"></span>
+                    Unité mobile
+                  </div>
+                </div>
+              </div>
+
+              {/* Map Controls */}
+              <div className="absolute bottom-6 right-6 flex flex-col gap-3">
+                <button className="bg-surface p-2.5 rounded-lg shadow-lg border border-outline hover:bg-surface-container-high text-on-surface transition-all">
+                  <span className="material-symbols-outlined">add</span>
+                </button>
+                <button className="bg-surface p-2.5 rounded-lg shadow-lg border border-outline hover:bg-surface-container-high text-on-surface transition-all">
+                  <span className="material-symbols-outlined">remove</span>
+                </button>
+                <button className="bg-surface p-2.5 rounded-lg shadow-lg border border-outline hover:bg-primary hover:text-on-primary text-on-surface transition-all">
+                  <span className="material-symbols-outlined">my_location</span>
+                </button>
+              </div>
             </div>
-            <div className="w-1 h-4 bg-error/80 rounded-full mt-1"></div>
+
+            {/* Map Filters */}
+            <div className="p-5 bg-surface border-t border-outline flex justify-between items-center">
+              <div className="flex items-center gap-6">
+                <span className="text-[10px] font-extrabold text-on-surface-variant uppercase tracking-widest">
+                  Filtres :
+                </span>
+                <div className="flex gap-2">
+                  <span className="bg-primary text-on-primary px-4 py-1.5 rounded-full text-[10px] font-extrabold cursor-pointer">
+                    Tout voir
+                  </span>
+                  <span className="bg-surface-container-low text-on-surface-variant px-4 py-1.5 rounded-full text-[10px] font-extrabold hover:bg-surface-container transition-all cursor-pointer">
+                    Enfant
+                  </span>
+                  <span className="bg-surface-container-low text-on-surface-variant px-4 py-1.5 rounded-full text-[10px] font-extrabold hover:bg-surface-container transition-all cursor-pointer">
+                    Adulte
+                  </span>
+                </div>
+              </div>
+              <div className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase">
+                Mise à jour : il y a 2 minutes
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel: Alerts & Operations Feed */}
+          <div className="flex flex-col gap-8">
+            {/* Critical Alerts */}
+            <div className="bg-surface dark:bg-slate-900 rounded-lg border border-outline shadow-sm p-6 flex flex-col overflow-hidden max-h-96">
+              <div className="flex justify-between items-center mb-5">
+                <h3 className="text-sm font-extrabold font-headline text-on-surface flex items-center gap-2">
+                  <span
+                    className="material-symbols-outlined text-error text-xl"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    warning
+                  </span>
+                  Alertes Critiques ({criticalAlerts.length})
+                </h3>
+                <a className="text-[10px] font-extrabold text-primary hover:underline uppercase tracking-wider">
+                  Voir tout
+                </a>
+              </div>
+              <div className="space-y-4 overflow-y-auto pr-2 flex-1">
+                {criticalAlerts.map((alert) => (
+                  <div
+                    key={alert.id}
+                    className={`p-4 rounded-lg border-l-4 flex gap-4 group hover:opacity-80 transition-all cursor-pointer ${
+                      alert.priority === 'critical'
+                        ? 'bg-red-50/50 dark:bg-red-950/20 border-error'
+                        : 'bg-slate-50 dark:bg-slate-800/50 border-orange-500'
+                    }`}
+                  >
+                    <div className="h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-outline shadow-sm">
+                      <img
+                        alt={alert.name}
+                        className="h-full w-full object-cover"
+                        src={alert.image}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-xs font-bold text-on-surface">
+                        {alert.name}, {alert.age} ans
+                      </h4>
+                      <p className="text-[10px] text-on-surface-variant flex items-center gap-1 mt-1 font-medium">
+                        <span className="material-symbols-outlined text-[14px]">location_on</span>
+                        {alert.location}
+                      </p>
+                      <p
+                        className={`text-[10px] font-bold mt-1.5 flex items-center gap-1 ${
+                          alert.priority === 'critical'
+                            ? 'text-error'
+                            : 'text-orange-600'
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-[14px]">schedule</span>
+                        {alert.elapsed}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Operations Live Feed */}
+            <div className="bg-slate-900 text-white rounded-lg shadow-xl p-6 flex flex-col overflow-hidden flex-1 relative border border-slate-800">
+              <div className="absolute top-0 right-0 p-6 opacity-5">
+                <span className="material-symbols-outlined text-8xl">radar</span>
+              </div>
+              <div className="flex justify-between items-center mb-6 relative z-10">
+                <h3 className="text-sm font-extrabold font-headline flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-xl">
+                    broadcast_on_home
+                  </span>
+                  Flux Opérations
+                </h3>
+                <span className="text-[10px] font-extrabold bg-primary/20 text-primary px-3 py-1 rounded-full border border-primary/30">
+                  24 NOUVEAUX
+                </span>
+              </div>
+              <div className="space-y-5 overflow-y-auto pr-2 flex-1 relative z-10">
+                {operationsFeed.map((item, idx) => (
+                  <div key={idx} className={`border-l-2 pl-5 py-0.5 relative ${
+                    item.priority === 'high'
+                      ? 'border-primary/30'
+                      : 'border-white/10'
+                  }`}>
+                    <div
+                      className={`absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full ${
+                        item.priority === 'high'
+                          ? 'bg-primary shadow-[0_0_12px_rgba(59,130,246,0.6)]'
+                          : 'bg-slate-700'
+                      }`}
+                    ></div>
+                    <p className={`text-[10px] font-extrabold uppercase tracking-wider ${
+                      item.priority === 'high'
+                        ? 'text-primary'
+                        : 'text-slate-500'
+                    }`}>
+                      {item.time}
+                    </p>
+                    <p className={`text-xs font-medium leading-relaxed mt-1 ${
+                      item.priority === 'high'
+                        ? 'text-white font-bold'
+                        : 'text-slate-300'
+                    }`}>
+                      {item.message}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <button className="mt-6 w-full py-3 bg-primary hover:bg-primary-dark text-on-primary rounded-lg text-xs font-extrabold transition-all shadow-lg shadow-primary/20">
+                Ouvrir le terminal complet
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Right Sidebar: Active Members */}
-        <div className="absolute top-6 right-6 bottom-6 w-80 flex flex-col gap-4 z-20 overflow-hidden hidden lg:flex">
-          {/* Summary Stats Card */}
-          <div className="glass p-5 rounded-2xl border border-white/40 shadow-xl" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(16px)' }}>
-            <h3 className="font-headline text-primary font-bold text-lg mb-4">Aperçu des Signalements</h3>
-            <div className="grid grid-cols-3 gap-2">
-              {stats.map((stat) => (
-                <div key={stat.label} className="p-3 rounded-xl text-center" style={{ backgroundColor: stat.bgColor }}>
-                  <span className="block font-extrabold text-xl" style={{ color: stat.textColor }}>
-                    {stat.value}
-                  </span>
-                  <span className="text-[10px] font-medium uppercase tracking-tighter" style={{ color: stat.textColor }}>
-                    {stat.label}
-                  </span>
-                </div>
-              ))}
+        {/* Recent Successes */}
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-extrabold font-headline text-on-surface tracking-tight">
+              Dernières Retrouvailles
+            </h3>
+            <div className="flex gap-3">
+              <button className="p-2.5 bg-surface border border-outline rounded-lg text-on-surface-variant hover:text-primary hover:border-primary transition-all">
+                <span className="material-symbols-outlined text-sm">chevron_left</span>
+              </button>
+              <button className="p-2.5 bg-surface border border-outline rounded-lg text-on-surface-variant hover:text-primary hover:border-primary transition-all">
+                <span className="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
             </div>
           </div>
-
-          {/* Scrollable Member List */}
-          <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-            {members.map((member) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {recentSuccesses.map((success, idx) => (
               <div
-                key={member.id}
-                className={`glass p-4 rounded-2xl border-2 shadow-2xl relative overflow-hidden ${
-                  member.status === 'sos'
-                    ? 'border-error/30 bg-red-50/30'
-                    : 'border-white/40'
-                }`}
-                style={{
-                  background: member.status === 'sos' ? 'rgba(255, 59, 48, 0.05)' : 'rgba(255, 255, 255, 0.7)',
-                  backdropFilter: 'blur(16px)',
-                }}
+                key={idx}
+                className="bg-surface dark:bg-slate-900 p-5 rounded-lg shadow-sm border border-outline flex items-center gap-5 group hover:shadow-md hover:border-primary/20 transition-all cursor-pointer"
               >
-                {member.status === 'sos' && (
-                  <div className="absolute top-0 right-0 bg-error px-3 py-1 rounded-bl-xl text-white text-[10px] font-bold uppercase tracking-widest">
-                    Urgent
-                  </div>
-                )}
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md shrink-0">
-                    <img className="w-full h-full object-cover" src={member.image} alt={member.name} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-bold text-primary truncate">{member.name}</h4>
-                      {member.status !== 'sos' && (
-                        <span
-                          className={`w-2 h-2 rounded-full ${
-                            member.status === 'safe'
-                              ? 'bg-secondary'
-                              : 'bg-on-tertiary-container'
-                          }`}
-                        ></span>
-                      )}
-                    </div>
-                    <p className="text-xs text-on-surface-variant mb-2">{member.relationship}</p>
-                    {member.status === 'sos' ? (
-                      <div className="flex items-center gap-1 text-error">
-                        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-                          location_on
-                        </span>
-                        <span className="text-[11px] font-semibold">{member.location}</span>
-                      </div>
-                    ) : member.status === 'safe' ? (
-                      <div className="flex items-center gap-1 text-slate-500">
-                        <span className="material-symbols-outlined text-sm">battery_5_bar</span>
-                        <span className="text-[11px]">{member.battery}% • Actif il y a 2 mins</span>
-                      </div>
-                    ) : (
-                      <div className="bg-on-tertiary-container/10 p-2 rounded-lg mt-1">
-                        <p className="text-[10px] text-on-tertiary-fixed-variant font-medium">{member.location}</p>
-                      </div>
-                    )}
+                <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0 relative ring-2 ring-surface-container-high">
+                  <img
+                    alt={success.name}
+                    className="h-full w-full object-cover"
+                    src={success.image}
+                  />
+                  <div className="absolute inset-0 bg-secondary/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span
+                      className="material-symbols-outlined text-white text-xl"
+                      style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                      check_circle
+                    </span>
                   </div>
                 </div>
-                {member.status === 'sos' && (
-                  <div className="mt-4 flex gap-2">
-                    <button className="flex-1 bg-error text-white text-xs font-bold py-2 rounded-lg hover:bg-on-error-container transition-colors">
-                      Appel d'Urgence
-                    </button>
-                    <button className="px-3 bg-surface-container-high rounded-lg text-primary">
-                      <span className="material-symbols-outlined text-lg">directions</span>
-                    </button>
-                  </div>
-                )}
+                <div className="min-w-0">
+                  <h4 className="text-xs font-extrabold text-on-surface">{success.name}</h4>
+                  <p className="text-[10px] text-secondary font-extrabold mt-1 uppercase tracking-wider">
+                    {success.location}
+                  </p>
+                  <p className="text-[10px] text-on-surface-variant mt-1 font-medium">
+                    {success.time}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
         </div>
+      </div>
 
-        {/* Left Top Widget: Search & Filters */}
-        <div className="absolute top-6 left-6 z-20 flex flex-col gap-3 w-64">
-          <div className="glass flex items-center gap-3 px-4 py-3 rounded-2xl border border-white/40 shadow-xl" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(16px)' }}>
-            <span className="material-symbols-outlined text-on-surface-variant">search</span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent border-none p-0 text-sm focus:ring-0 placeholder:text-on-surface-variant/60 w-full"
-              placeholder="Rechercher un signalement..."
-            />
-          </div>
-          <div className="flex gap-2">
-            <button className="glass px-4 py-2 rounded-full text-[11px] font-bold text-primary border border-white/60 shadow-sm hover:bg-white transition-colors" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(16px)' }}>
-              Repères
-            </button>
-            <button className="glass px-4 py-2 rounded-full text-[11px] font-bold text-primary border border-white/60 shadow-sm hover:bg-white transition-colors" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(16px)' }}>
-              Trafic
-            </button>
-          </div>
-        </div>
-
-        {/* Bottom Left: Safety Metrics */}
-        <div className="absolute bottom-6 left-6 z-20 hidden md:block">
-          <div className="glass p-4 rounded-2xl border border-white/40 shadow-xl max-w-xs" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(16px)' }}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
-                <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  verified_user
-                </span>
-              </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Indice de Sécurité</p>
-                <p className="text-lg font-extrabold text-primary">Stabilité Élevée</p>
-              </div>
-            </div>
-            <div className="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-tertiary-fixed-dim to-secondary w-[88%] rounded-full"></div>
-            </div>
-            <p className="mt-2 text-[10px] text-slate-500 leading-tight">
-              Tous les signalements sont actuellement stables dans la région de Dakar.
-            </p>
-          </div>
-        </div>
-
-        {/* Map Controls */}
-        <div className="fixed bottom-10 right-96 z-30 flex flex-col gap-2 hidden lg:flex">
-          <button className="w-10 h-10 glass rounded-xl border border-white/40 shadow-lg flex items-center justify-center text-primary hover:bg-white transition-all" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(16px)' }}>
-            <span className="material-symbols-outlined">add</span>
-          </button>
-          <button className="w-10 h-10 glass rounded-xl border border-white/40 shadow-lg flex items-center justify-center text-primary hover:bg-white transition-all" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(16px)' }}>
-            <span className="material-symbols-outlined">remove</span>
-          </button>
-          <button className="w-10 h-10 glass rounded-xl border border-white/40 shadow-lg flex items-center justify-center text-primary hover:bg-white transition-all" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(16px)' }}>
-            <span className="material-symbols-outlined">my_location</span>
-          </button>
-        </div>
-      </main>
-    </div>
+      {/* Float FAB for quick signalement */}
+      <button className="fixed bottom-10 right-10 h-16 w-16 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 group hover:bg-primary-dark ring-4 ring-primary/20">
+        <span className="material-symbols-outlined text-3xl">add</span>
+        <span className="absolute right-full mr-6 bg-slate-900 text-white px-5 py-3 rounded-lg text-sm font-extrabold opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap shadow-xl">
+          Signaler une disparition
+        </span>
+      </button>
+    </AdminLayout>
   )
 }

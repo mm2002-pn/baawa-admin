@@ -1,6 +1,4 @@
 import { useAuthStore } from '../../store/authStore'
-import { useThemeStore } from '../../store/themeStore'
-import { Button } from '../common/Button/Button'
 import { useState } from 'react'
 
 interface HeaderProps {
@@ -8,71 +6,104 @@ interface HeaderProps {
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-  const { user, logout } = useAuthStore()
-  const { isDark, toggleTheme } = useThemeStore()
+  const { user } = useAuthStore()
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showSearchFocus, setShowSearchFocus] = useState(false)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
-      <div className="flex items-center justify-between px-6 py-4">
+    <header className="sticky top-0 z-40 border-b border-outline bg-surface dark:bg-slate-950 shadow-sm h-20">
+      <div className="flex items-center justify-between h-full px-10 w-full">
+        {/* Left: Direct Live Badge & Menu */}
         <div className="flex items-center gap-4">
           <button
             onClick={onMenuClick}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg lg:hidden transition-colors"
+            className="p-2 hover:bg-surface-container-high rounded-lg lg:hidden transition-colors text-on-surface-variant"
             aria-label="Toggle menu"
           >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <span className="material-symbols-outlined text-xl">menu</span>
           </button>
+
+          <div className="h-4 w-[1px] bg-outline mx-2 hidden sm:block"></div>
+
+          <div className="flex items-center gap-2 text-secondary font-bold text-sm">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
+            </span>
+            Direct Live
+          </div>
         </div>
 
+        {/* Center: Search Bar */}
+        <div className="hidden lg:flex items-center bg-surface-container-low px-5 py-2.5 rounded-full gap-3 w-96">
+          <span className="material-symbols-outlined text-on-surface-variant text-lg">search</span>
+          <input
+            type="text"
+            onFocus={() => setShowSearchFocus(true)}
+            onBlur={() => setShowSearchFocus(false)}
+            className="bg-transparent border-none focus:ring-0 text-sm w-full font-label placeholder-on-surface-variant/60"
+            placeholder="Rechercher un dossier ou une zone..."
+          />
+        </div>
+
+        {/* Right: Actions & User */}
         <div className="flex items-center gap-4">
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-            aria-label="Toggle theme"
-          >
-            {isDark() ? (
-              <svg className="h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-              </svg>
-            ) : (
-              <svg className="h-5 w-5 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 2a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.536l-2.071 2.071a1 1 0 01-1.414 0l-2.071-2.071a1 1 0 011.414-1.414L9 13.586l1.464-1.465a1 1 0 011.414 1.414zM16.364 5.636l-1.414-1.414a1 1 0 011.414-1.414l1.414 1.414a1 1 0 01-1.414 1.414zm2.828 9.172a1 1 0 11-1.414 1.414l1.414-1.414zm0-7.07a1 1 0 010 1.414L17.05 9.172a1 1 0 11-1.414-1.414l1.414-1.414zM5.106 12.364L3.636 10.893a1 1 0 011.414-1.414l1.414 1.414a1 1 0 01-1.414 1.414zM3.464 3.464a1 1 0 011.414 0L6.95 5.95a1 1 0 11-1.414 1.414L3.464 4.878a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            )}
+          {/* Notifications */}
+          <button className="p-2.5 text-on-surface-variant hover:bg-surface-container-high hover:text-primary rounded-full transition-all relative">
+            <span className="material-symbols-outlined">notifications</span>
+            <span className="absolute top-2 right-2 h-2.5 w-2.5 bg-error rounded-full border-2 border-surface"></span>
           </button>
 
-          {/* User Menu */}
+          {/* Help */}
+          <button className="p-2.5 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all hidden sm:block">
+            <span className="material-symbols-outlined">help</span>
+          </button>
+
+          {/* Emergency Button */}
+          <button className="bg-error text-on-error px-6 py-2 rounded-lg text-sm font-bold hover:bg-on-error-container shadow-md shadow-error/10 transition-all active:scale-95 hidden sm:block">
+            Emergency
+          </button>
+
+          {/* User Profile */}
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              className="flex items-center gap-3 hover:bg-surface-container-high px-2 py-1 rounded-lg transition-colors"
             >
-              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-semibold">
-                {user?.firstName?.charAt(0)}
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-headline font-extrabold text-on-surface leading-none mb-0.5">
+                  {user?.firstName} {user?.lastName}
+                </span>
+                <span className="text-[10px] font-bold text-primary uppercase tracking-wider leading-none">
+                  Admin
+                </span>
               </div>
-              <div className="hidden sm:block text-sm font-medium text-slate-900 dark:text-white">
-                {user?.firstName}
+              <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-surface-container-highest bg-primary flex items-center justify-center text-on-primary font-bold shadow-md">
+                {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
               </div>
             </button>
 
             {showUserMenu && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 z-50">
-                <div className="px-4 py-2 border-b border-slate-200 dark:border-slate-700">
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">{user?.firstName} {user?.lastName}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{user?.email}</p>
+              <div className="absolute top-full right-0 mt-2 w-56 bg-surface dark:bg-slate-900 border border-outline rounded-lg shadow-lg py-2 z-50">
+                <div className="px-4 py-3 border-b border-outline">
+                  <p className="text-sm font-headline font-bold text-on-surface">
+                    {user?.firstName} {user?.lastName}
+                  </p>
+                  <p className="text-xs text-on-surface-variant mt-1">{user?.email}</p>
                 </div>
                 <button
-                  onClick={() => {
-                    logout()
-                    window.location.href = '/login'
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  onClick={() => setShowUserMenu(false)}
+                  className="w-full text-left px-4 py-2 text-sm text-on-surface hover:bg-surface-container-high transition-colors font-headline"
                 >
-                  Déconnexion
+                  <span className="material-symbols-outlined text-sm align-middle mr-2">account_circle</span>
+                  Profil
+                </button>
+                <button
+                  onClick={() => setShowUserMenu(false)}
+                  className="w-full text-left px-4 py-2 text-sm text-on-surface hover:bg-surface-container-high transition-colors font-headline"
+                >
+                  <span className="material-symbols-outlined text-sm align-middle mr-2">settings</span>
+                  Paramètres
                 </button>
               </div>
             )}
