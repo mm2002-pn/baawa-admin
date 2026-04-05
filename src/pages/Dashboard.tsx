@@ -162,7 +162,7 @@ export default function DashboardPage() {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full flex flex-col p-6 border-r border-outline bg-white w-72 flex-shrink-0 z-50">
+      <aside className="fixed left-0 top-0 h-full flex flex-col p-6  bg-white w-72 flex-shrink-0 z-50">
         {/* Logo & Header */}
         <div className="flex flex-col gap-2 mb-10 px-2">
           <img
@@ -204,7 +204,7 @@ export default function DashboardPage() {
             <span className="material-symbols-outlined text-lg">add_alert</span>
             Signaler une disparition
           </button>
-          <div className="pt-4 border-t border-slate-100">
+          <div className="pt-4">
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-error hover:bg-error/5 rounded-lg transition-all duration-200 w-full"
@@ -219,7 +219,7 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="ml-72 flex-1 flex flex-col h-full bg-background relative overflow-hidden">
         {/* Header */}
-        <header className="flex justify-between items-center h-20 px-10 w-full sticky top-0 z-40 bg-white border-b border-outline">
+        <header className="flex justify-between items-center h-20 px-10 w-full sticky top-0 z-40 bg-white ">
           <div className="flex items-center gap-4">
             <div className="h-4 w-[1px] bg-slate-200 mx-2"></div>
             <div className="flex items-center gap-2 text-secondary font-bold text-sm">
