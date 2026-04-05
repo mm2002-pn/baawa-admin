@@ -221,10 +221,10 @@ export default function DashboardPage() {
         {/* Header */}
         <header className="flex justify-between items-center h-20 px-10 w-full sticky top-0 z-40 bg-white">
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-secondary font-bold text-sm">
+            <div className="flex items-center gap-2 text-green-600 font-bold text-sm">
               <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-600"></span>
               </span>
               <span>Direct Live</span>
             </div>
