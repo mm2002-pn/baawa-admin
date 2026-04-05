@@ -104,7 +104,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                 className={cn(
                   'flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors',
                   isActive
-                    ? 'bg-primary-500 text-white'
+                    ? 'bg-blue-600 text-white'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                 )}
               >
