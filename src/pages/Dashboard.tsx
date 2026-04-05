@@ -219,15 +219,14 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="ml-72 flex-1 flex flex-col h-full bg-background relative overflow-hidden">
         {/* Header */}
-        <header className="flex justify-between items-center h-20 px-10 w-full sticky top-0 z-40 bg-white ">
-          <div className="flex items-center gap-4">
-            <div className="h-4 w-[1px] bg-slate-200 mx-2"></div>
+        <header className="flex justify-between items-center h-20 px-10 w-full sticky top-0 z-40 bg-white">
+          <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 text-secondary font-bold text-sm">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
               </span>
-              Direct Live
+              <span>Direct Live</span>
             </div>
           </div>
 
@@ -255,8 +254,8 @@ export default function DashboardPage() {
               </button>
 
               {/* Emergency */}
-              <button className="bg-error text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-red-600 shadow-md shadow-error/10 transition-all">
-                Emergency
+              <button className="bg-error text-white px-6 py-2.5 rounded-lg text-sm font-extrabold hover:bg-red-700 shadow-lg shadow-error/30 transition-all active:scale-95">
+                🚨 Emergency
               </button>
 
               {/* User Profile */}
