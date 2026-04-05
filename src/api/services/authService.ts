@@ -1,11 +1,15 @@
 import { apiClient } from '../client'
-import { LoginCredentials, AuthResponse, User } from '../types'
+import { LoginCredentials, AuthResponse, BackendAuthResponse, User } from '../types'
 
 export const authService = {
-  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
+  login: async (credentials: LoginCredentials): Promise<BackendAuthResponse> => {
     try {
       const response = await apiClient.post('/auth/classic-login', credentials)
-      return response as unknown as AuthResponse
+
+      // Backend returns: { success: true, statusCode: 200, message: '...', data: {...} }
+      // The response interceptor already extracts response.data
+      // So response here is: { success: true, statusCode: 200, message: '...', data: {...} }
+      return response as unknown as BackendAuthResponse
     } catch (error) {
       console.error('Login error:', error)
       throw error

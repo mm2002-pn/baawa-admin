@@ -154,6 +154,13 @@ export interface AuthResponse {
   user: User
 }
 
+export interface BackendAuthResponse {
+  success: boolean
+  statusCode: number
+  message: string
+  data: AuthResponse
+}
+
 export interface TokenPayload {
   sub: string
   email: string

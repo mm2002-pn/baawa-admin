@@ -7,6 +7,7 @@ import { Button } from '../../components/common/Button/Button'
 import { useAuthStore } from '../../store/authStore'
 import { useToast } from '../../hooks/useToast'
 import { authService } from '../../api/services/authService'
+import type { BackendAuthResponse } from '../../api/types'
 
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -41,12 +42,29 @@ export default function LoginPage() {
       setIsLoading(true)
       const response = await authService.login(data)
 
+      console.log('✅ Login response:', response)
+
+      // Backend returns: { success: true, statusCode: 200, message: '...', data: {...} }
+      const authData = response.data
+      console.log('📊 Auth data:', authData)
+
       // Set auth in store
-      setAuth(response.user, response.accessToken, response.refreshToken)
+      setAuth(authData.user, authData.accessToken, authData.refreshToken)
+
+      // Check store immediately after setAuth
+      const state = useAuthStore.getState()
+      console.log('📦 Store after setAuth:', {
+        isAuthenticated: state.isAuthenticated,
+        user: state.user,
+        hasTokens: !!state.accessToken && !!state.refreshToken,
+      })
+
       toast.success('Connexion réussie!')
 
       // Navigate to dashboard - use setTimeout to ensure store is updated
       setTimeout(() => {
+        const currentState = useAuthStore.getState()
+        console.log('🔍 Store before navigate:', currentState.isAuthenticated)
         navigate('/', { replace: true })
       }, 100)
     } catch (error: any) {
