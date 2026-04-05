@@ -20,7 +20,8 @@ export const usersService = {
     const response = await apiClient.get(`/users/${id}`)
     console.log('📊 getById response:', response)
 
-    // Handle both wrapped and direct responses
+    // Backend returns wrapped response: { success, statusCode, message, data: { user } }
+    // response.data contains the user object
     const userData = response.data || response
     return userData as unknown as User
   },
