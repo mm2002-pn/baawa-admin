@@ -70,9 +70,9 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         {/* Logo & Header */}
         <div className="flex flex-col gap-2 px-6 py-6 border-b border-outline">
           <div className="h-14 w-auto object-contain flex items-center">
-            <span className="material-symbols-outlined text-2xl text-primary font-bold">
-              baawa_logo
-            </span>
+            <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center text-white font-headline font-bold text-xl">
+              BA
+            </div>
           </div>
           <div className="mt-2">
             <h2 className="text-sm font-extrabold text-on-surface font-headline uppercase tracking-tight">
