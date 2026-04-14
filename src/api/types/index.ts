@@ -51,6 +51,7 @@ export interface User {
   createdAt: string
   updatedAt?: string
   lastLoginAt?: string | null
+  officer?: Officer
 }
 
 export interface Officer {
@@ -245,16 +246,11 @@ export interface TipFilters {
 
 export interface CreateUserDto {
   email: string
+  password: string
   firstName: string
   lastName: string
   phoneNumber: string
   role: Role
-  zoneGeo?: string
-  officer?: {
-    badgeNumber: string
-    rank: string
-    policeUnit: string
-  }
 }
 
 export interface UpdateUserDto {
@@ -263,7 +259,6 @@ export interface UpdateUserDto {
   phoneNumber?: string
   role?: Role
   isActive?: boolean
-  zoneGeo?: string
 }
 
 export interface UpdateOfficerDto {

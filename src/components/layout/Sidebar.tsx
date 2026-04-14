@@ -1,5 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
-import { cn } from '../../utils/cn'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 
 interface NavItem {
@@ -9,31 +8,12 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  {
-    label: 'Tableau de bord',
-    href: '/',
-    icon: 'dashboard',
-  },
-  {
-    label: 'Cartographie',
-    href: '/map',
-    icon: 'map',
-  },
-  {
-    label: 'Dossiers actifs',
-    href: '/cases',
-    icon: 'person_search',
-  },
-  {
-    label: 'Ressources',
-    href: '/resources',
-    icon: 'folder_shared',
-  },
-  {
-    label: 'Paramètres',
-    href: '/settings',
-    icon: 'settings',
-  },
+  { label: 'Tableau de bord', href: '/', icon: 'dashboard' },
+  { label: 'Utilisateurs', href: '/users', icon: 'people' },
+  { label: 'Policiers', href: '/officers', icon: 'local_police' },
+  { label: 'Signalements', href: '/signalements', icon: 'person_search' },
+  { label: 'Témoignages', href: '/tips', icon: 'record_voice_over' },
+  { label: 'Paramètres', href: '/settings', icon: 'settings' },
 ]
 
 interface SidebarProps {
@@ -43,12 +23,16 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   const location = useLocation()
+  const navigate = useNavigate()
   const { logout } = useAuthStore()
 
   const handleLogout = () => {
     logout()
     window.location.href = '/login'
   }
+
+  const isActive = (href: string) =>
+    location.pathname === href || location.pathname.startsWith(href + '/')
 
   return (
     <>
@@ -60,71 +44,67 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         />
       )}
 
-      {/* Sidebar - Material Design 3 style */}
+      {/* Sidebar */}
       <aside
-        className={cn(
-          'fixed left-0 top-0 h-screen w-72 border-r border-outline bg-surface dark:bg-slate-950 transition-transform duration-300 z-40 lg:relative lg:translate-x-0 flex flex-col',
+        className={`fixed left-0 top-0 h-full flex flex-col p-6 bg-white w-72 flex-shrink-0 z-50 border-r border-slate-100 transition-transform duration-300 lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
+        }`}
       >
         {/* Logo & Header */}
-        <div className="flex flex-col gap-2 px-6 py-6 border-b border-outline">
-          <div className="h-14 w-auto object-contain flex items-center">
-            <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center text-white font-headline font-bold text-xl">
-              BA
+        <div className="flex flex-col gap-2 mb-10 px-2">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="material-symbols-outlined text-white">shield</span>
             </div>
-          </div>
-          <div className="mt-2">
-            <h2 className="text-sm font-extrabold text-on-surface font-headline uppercase tracking-tight">
-              Centre de Commandement
-            </h2>
-            <p className="text-[10px] text-on-surface-variant font-label tracking-widest uppercase font-semibold">
-              Unité de Recherche
-            </p>
+            <div>
+              <h2 className="text-lg font-extrabold text-slate-900">
+                BAAWA
+              </h2>
+              <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
+                Admin Panel
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/')
-
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                onClick={onClose}
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg font-headline font-bold transition-all duration-200',
-                  isActive
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-on-surface-variant hover:bg-surface-container-low'
-                )}
-              >
-                <span className="material-symbols-outlined text-xl">
-                  {item.icon}
-                </span>
-                <span className="text-sm">{item.label}</span>
-              </Link>
-            )
-          })}
+        <nav className="flex-1 space-y-1">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              onClick={onClose}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                isActive(item.href)
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <span className="material-symbols-outlined text-xl">{item.icon}</span>
+              <span className="text-sm">{item.label}</span>
+            </Link>
+          ))}
         </nav>
 
         {/* Footer Actions */}
-        <div className="mt-auto space-y-4 px-4 py-6 border-t border-outline">
-          <button className="w-full py-3.5 px-4 bg-primary text-on-primary rounded-lg font-bold text-sm shadow-lg shadow-primary/20 flex items-center justify-center gap-2 hover:bg-primary-dark transition-all active:scale-95">
+        <div className="mt-auto space-y-4">
+          <button
+            onClick={() => {
+              navigate('/signalements/create')
+              onClose?.()
+            }}
+            className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-bold text-sm shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:bg-blue-700 transition-all"
+          >
             <span className="material-symbols-outlined text-lg">add_alert</span>
-            Signaler une disparition
+            Nouveau signalement
           </button>
-          <div className="pt-4 border-t border-outline">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-error hover:bg-error/5 rounded-lg transition-all duration-200 font-headline"
-            >
-              <span className="material-symbols-outlined">logout</span>
-              <span className="text-sm font-bold">Déconnexion</span>
-            </button>
-          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 w-full"
+          >
+            <span className="material-symbols-outlined">logout</span>
+            <span className="text-sm font-semibold">Déconnexion</span>
+          </button>
         </div>
       </aside>
     </>

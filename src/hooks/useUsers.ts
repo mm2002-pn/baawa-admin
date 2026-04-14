@@ -26,14 +26,14 @@ export function useCreateUser() {
   return useMutation({
     mutationFn: (data: CreateUserDto) => usersService.create(data),
     onSuccess: (newUser) => {
-      toast.success('Utilisateur créé avec succès')
+      // Don't show toast here - let the component handle it (for officer profile creation flow)
       // Invalidate the users list to refetch
       queryClient.invalidateQueries({ queryKey: ['users'] })
       return newUser
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Erreur lors de la création de l\'utilisateur'
-      toast.error(message)
+      toast.error(Array.isArray(message) ? message.join(', ') : message)
     },
   })
 }
@@ -92,6 +92,23 @@ export function useToggleUserActive() {
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Erreur lors de la modification du statut'
       toast.error(message)
+    },
+  })
+}
+
+export function useCreateOfficerProfile() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: { userId: string; badgeNumber: string; rank: string; policeUnit: string }) =>
+      usersService.createOfficerProfile(data.userId, {
+        badgeNumber: data.badgeNumber,
+        rank: data.rank,
+        policeUnit: data.policeUnit,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      queryClient.invalidateQueries({ queryKey: ['officers'] })
     },
   })
 }

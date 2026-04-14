@@ -53,6 +53,23 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
         {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
       </div>
 
+      {/* Password (only for creation) */}
+      {!isEditing && (
+        <div>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            Mot de passe <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="password"
+            {...register('password')}
+            className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+            placeholder="Minimum 8 caractères"
+          />
+          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Minimum 8 caractères</p>
+        </div>
+      )}
+
       {/* First Name & Last Name */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -112,20 +129,6 @@ export function UserForm({ initialData, onSubmit, isLoading = false, isEditing =
           <option value={Role.ADMIN_BAAWA}>Admin BAAWA</option>
         </select>
         {errors.role && <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>}
-      </div>
-
-      {/* Zone Géographique */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-          Zone Géographique
-        </label>
-        <input
-          type="text"
-          {...register('zoneGeo')}
-          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-          placeholder="Dakar, Thiès, etc."
-        />
-        {errors.zoneGeo && <p className="text-red-500 text-sm mt-1">{errors.zoneGeo.message}</p>}
       </div>
 
       {/* Officer Fields (shown if role is POLICIER) */}

@@ -1,7 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { AdminLayout } from '../../components/layout/AdminLayout'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/common/Card/Card'
-import { Button } from '../../components/common/Button/Button'
 import { UserForm } from '../../components/UserForm'
 import { useUser, useUpdateUser } from '../../hooks/useUsers'
 import { CreateUserFormData } from '../../schemas/userSchema'
@@ -14,9 +12,9 @@ export default function EditUserPage() {
 
   if (!id) {
     return (
-      <AdminLayout>
-        <div className="text-center py-12">
-          <p className="text-red-600 dark:text-red-400">ID utilisateur non valide</p>
+      <AdminLayout title="Éditer l'utilisateur">
+        <div className="bg-white rounded-xl border border-slate-100 p-12 text-center">
+          <p className="text-red-600">ID utilisateur non valide</p>
         </div>
       </AdminLayout>
     )
@@ -24,9 +22,9 @@ export default function EditUserPage() {
 
   if (userLoading) {
     return (
-      <AdminLayout>
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <AdminLayout title="Éditer l'utilisateur">
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
         </div>
       </AdminLayout>
     )
@@ -34,9 +32,9 @@ export default function EditUserPage() {
 
   if (!user) {
     return (
-      <AdminLayout>
-        <div className="text-center py-12">
-          <p className="text-red-600 dark:text-red-400">Utilisateur non trouvé</p>
+      <AdminLayout title="Éditer l'utilisateur">
+        <div className="bg-white rounded-xl border border-slate-100 p-12 text-center">
+          <p className="text-red-600">Utilisateur non trouvé</p>
         </div>
       </AdminLayout>
     )
@@ -60,34 +58,27 @@ export default function EditUserPage() {
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout title={`Éditer: ${user.firstName} ${user.lastName}`}>
       <div className="space-y-6 max-w-2xl">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Éditer l'utilisateur</h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-2">
-            {user.firstName} {user.lastName}
-          </p>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate(`/users/${id}`)}
+            className="px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-bold text-sm transition-colors flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+            Retour aux détails
+          </button>
         </div>
 
-        <div className="flex gap-2 mb-4">
-          <Button variant="secondary" onClick={() => navigate(`/users/${id}`)}>
-            ← Retour aux détails
-          </Button>
+        <div className="bg-white rounded-xl border border-slate-100 p-6">
+          <h2 className="text-lg font-bold text-slate-900 mb-6">Informations de l'utilisateur</h2>
+          <UserForm
+            initialData={user}
+            onSubmit={handleSubmit}
+            isLoading={updateUserMutation.isPending}
+            isEditing
+          />
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Informations de l'utilisateur</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <UserForm
-              initialData={user}
-              onSubmit={handleSubmit}
-              isLoading={updateUserMutation.isPending}
-              isEditing
-            />
-          </CardContent>
-        </Card>
       </div>
     </AdminLayout>
   )

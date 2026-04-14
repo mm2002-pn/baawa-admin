@@ -4,17 +4,22 @@ import { Role } from '../api/types'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
-  requiredRole?: Role
+  allowedRoles?: Role[]
 }
 
-export function ProtectedRoute({ children, requiredRole = Role.ADMIN_BAAWA }: ProtectedRouteProps) {
+// Roles allowed to access the admin panel
+const ADMIN_ROLES = [Role.ADMIN_BAAWA, Role.POLICIER]
+
+export function ProtectedRoute({ children, allowedRoles = ADMIN_ROLES }: ProtectedRouteProps) {
   const { isAuthenticated, user } = useAuthStore()
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
+  // Check if user's role is in the allowed roles
+  if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
+    // CITOYEN users cannot access admin panel
     return <Navigate to="/login" replace />
   }
 

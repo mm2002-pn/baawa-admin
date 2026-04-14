@@ -44,4 +44,12 @@ export const usersService = {
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/users/${id}`)
   },
+
+  createOfficerProfile: async (
+    userId: string,
+    data: { badgeNumber: string; rank: string; policeUnit: string }
+  ): Promise<any> => {
+    const response = await apiClient.post(`/users/officers/${userId}`, data)
+    return response
+  },
 }
