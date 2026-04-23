@@ -4,26 +4,18 @@ import { AdminLayout } from '../../components/layout/AdminLayout'
 import { useSignalements, useResolveSignalement, useVerifySignalement, useDeleteSignalement } from '../../hooks/useSignalements'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import CreateSignalementModal from '../../components/signalements/CreateSignalementModal'
-import SignalementDetailsDrawer from '../../components/signalements/SignalementDetailsDrawer'
-import { useQueryClient } from '@tanstack/react-query'
-import { Signalement } from '../../api/types'
 
 export default function SignalementsListPage() {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('ALL')
+  const [statusFilter, setStatusFilter] = useState<string>('')
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [selectedSignalement, setSelectedSignalement] = useState<Signalement | null>(null)
-  const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false)
 
   const { data, isLoading } = useSignalements(page, limit, {
     search: search || undefined,
-    status: statusFilter,
+    status: statusFilter || undefined,
   })
 
   const verifyMutation = useVerifySignalement()
@@ -76,7 +68,7 @@ export default function SignalementsListPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <p className="text-slate-600">{totalItems} signalements au total</p>
           <button
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => navigate('/signalements/create')}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold text-sm shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2 justify-center"
           >
             <span className="material-symbols-outlined">add</span>
@@ -120,7 +112,7 @@ export default function SignalementsListPage() {
                 }}
                 className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-blue-600"
               >
-                <option value="ALL">Tous les statuts</option>
+                <option value="">Tous les statuts</option>
                 <option value="PENDING">En attente</option>
                 <option value="PUBLISHED">Publié</option>
                 <option value="VERIFIED">Vérifié</option>
@@ -132,7 +124,7 @@ export default function SignalementsListPage() {
             <button
               onClick={() => {
                 setSearch('')
-                setStatusFilter('ALL')
+                setStatusFilter('')
                 setPage(1)
               }}
               className="px-6 py-2 text-sm font-bold text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
@@ -216,10 +208,7 @@ export default function SignalementsListPage() {
                         </span>
                         <div className="flex gap-2 flex-wrap">
                           <button
-                            onClick={() => {
-                              setSelectedSignalement(signalement)
-                              setIsDetailsDrawerOpen(true)
-                            }}
+                            onClick={() => navigate(`/signalements/${signalement.id}`)}
                             className="px-3 py-2 text-sm font-bold text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                           >
                             Détails
@@ -313,22 +302,6 @@ export default function SignalementsListPage() {
           </div>
         </div>
       )}
-
-      <CreateSignalementModal 
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={() => {
-          queryClient.invalidateQueries({ queryKey: ['signalements'] })
-        }}
-      />
-      <SignalementDetailsDrawer 
-        isOpen={isDetailsDrawerOpen}
-        onClose={() => {
-          setIsDetailsDrawerOpen(false)
-          setSelectedSignalement(null)
-        }}
-        signalement={selectedSignalement}
-      />
     </AdminLayout>
   )
 }

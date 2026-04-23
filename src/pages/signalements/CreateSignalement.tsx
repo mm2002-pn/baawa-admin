@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { AdminLayout } from '../../components/layout/AdminLayout'
 import { apiClient } from '../../api/client'
 import { useToast } from '../../hooks/useToast'
-import LocationPicker from '../../components/signalements/LocationPicker'
 
 const REGIONS = ['Dakar', 'Thiès', 'Kaolack', 'Tambacounda', 'Matam', 'Saint-Louis', 'Kolda', 'Ziguinchor', 'Diourbel', 'Louga', 'Fatick', 'Kaffrine']
 const RELATIONSHIPS = [
@@ -247,49 +246,39 @@ export default function CreateSignalementPage() {
                 <div></div>
               </div>
 
-              <div className="grid grid-cols-1 gap-6">
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Sélectionner le lieu sur la carte *</label>
-                  <LocationPicker 
-                    onLocationSelect={(lat, lng) => {
-                      setFormData(prev => ({
-                        ...prev,
-                        lastLatitude: lat.toString(),
-                        lastLongitude: lng.toString()
-                      }))
-                    }}
-                    initialLocation={
-                      formData.lastLatitude && formData.lastLongitude 
-                      ? { lat: parseFloat(formData.lastLatitude), lng: parseFloat(formData.lastLongitude) }
-                      : undefined
-                    }
-                  />
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Latitude</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">Latitude *</label>
                   <input
                     type="number"
                     name="lastLatitude"
                     value={formData.lastLatitude}
-                    readOnly
-                    className="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed"
-                    placeholder="Auto-rempli par la carte"
+                    onChange={handleChange}
+                    required
+                    step="0.0001"
+                    min="-90"
+                    max="90"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    placeholder="14.7167"
                   />
+                  <p className="text-xs text-slate-500 mt-2">Entre -90 et 90</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Longitude</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">Longitude *</label>
                   <input
                     type="number"
                     name="lastLongitude"
                     value={formData.lastLongitude}
-                    readOnly
-                    className="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed"
-                    placeholder="Auto-rempli par la carte"
+                    onChange={handleChange}
+                    required
+                    step="0.0001"
+                    min="-180"
+                    max="180"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    placeholder="-17.4667"
                   />
+                  <p className="text-xs text-slate-500 mt-2">Entre -180 et 180</p>
                 </div>
               </div>
 
