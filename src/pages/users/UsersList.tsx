@@ -5,15 +5,21 @@ import { useUsers, useDeleteUser, useToggleUserActive } from '../../hooks/useUse
 import { User, Role } from '../../api/types'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import UserModal from '../../components/users/UserModal'
+import UserDetailsDrawer from '../../components/users/UserDetailsDrawer'
 
 export default function UsersListPage() {
-  const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState('')
   const [selectedRole, setSelectedRole] = useState<string>('')
   const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [deleteConfirm, setDeleteConfirm] = useState<User | null>(null)
+  
+  // Modal & Drawer States
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   const { data, isLoading, error } = useUsers(page, limit, {
     search: search || undefined,
@@ -73,7 +79,10 @@ export default function UsersListPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <p className="text-slate-500 text-sm">{data?.total || 0} utilisateurs au total</p>
           <button
-            onClick={() => navigate('/users/create')}
+            onClick={() => {
+              setSelectedUser(null)
+              setIsModalOpen(true)
+            }}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold text-sm shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2 justify-center"
           >
             <span className="material-symbols-outlined">add</span>
@@ -242,14 +251,20 @@ export default function UsersListPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => navigate(`/users/${user.id}`)}
+                              onClick={() => {
+                                setSelectedUser(user)
+                                setIsDrawerOpen(true)
+                              }}
                               className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
                               title="Voir détails"
                             >
                               <span className="material-symbols-outlined text-lg">visibility</span>
                             </button>
                             <button
-                              onClick={() => navigate(`/users/${user.id}/edit`)}
+                              onClick={() => {
+                                setSelectedUser(user)
+                                setIsModalOpen(true)
+                              }}
                               className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
                               title="Éditer"
                             >
@@ -309,14 +324,20 @@ export default function UsersListPage() {
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => navigate(`/users/${user.id}`)}
+                        onClick={() => {
+                          setSelectedUser(user)
+                          setIsDrawerOpen(true)
+                        }}
                         className="flex-1 px-3 py-2 text-sm font-bold text-blue-600 hover:bg-blue-100 rounded-lg transition-colors flex items-center justify-center gap-2"
                       >
                         <span className="material-symbols-outlined">visibility</span>
                         Voir
                       </button>
                       <button
-                        onClick={() => navigate(`/users/${user.id}/edit`)}
+                        onClick={() => {
+                          setSelectedUser(user)
+                          setIsModalOpen(true)
+                        }}
                         className="flex-1 px-3 py-2 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors flex items-center justify-center gap-2"
                       >
                         <span className="material-symbols-outlined">edit</span>
@@ -394,6 +415,17 @@ export default function UsersListPage() {
           </div>
         </div>
       )}
+      <UserModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        user={selectedUser}
+      />
+
+      <UserDetailsDrawer 
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        user={selectedUser}
+      />
     </AdminLayout>
   )
 }
