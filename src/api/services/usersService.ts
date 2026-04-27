@@ -10,8 +10,17 @@ export const usersService = {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
-      ...filters,
     })
+
+    // Ajouter les filtres seulement s'ils ont une valeur réelle
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value.toString())
+        }
+      })
+    }
+
     const response = await apiClient.get(`/users?${params.toString()}`)
     return response as unknown as PaginatedResponse<User>
   },
