@@ -47,7 +47,6 @@ export default function EditUserPage() {
         lastName: data.lastName,
         phoneNumber: data.phoneNumber,
         role: data.role,
-        zoneGeo: data.zoneGeo,
       },
       {
         onSuccess: () => {

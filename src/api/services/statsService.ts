@@ -19,6 +19,9 @@ export interface DashboardStatsResponse {
       region: string
       status: string
       photoUrl: string
+      lastLatitude?: number
+      lastLongitude?: number
+      lastAddress?: string
     }
   }>
 }

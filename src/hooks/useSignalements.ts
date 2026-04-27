@@ -103,7 +103,7 @@ export const useSignalement = (id: string) => {
 
 export const useVerifySignalement = () => {
   const queryClient = useQueryClient()
-  const toast = useToast()
+  const { toast } = useToast()
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -122,7 +122,7 @@ export const useVerifySignalement = () => {
 
 export const useResolveSignalement = () => {
   const queryClient = useQueryClient()
-  const toast = useToast()
+  const { toast } = useToast()
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -141,7 +141,7 @@ export const useResolveSignalement = () => {
 
 export const useDeleteSignalement = () => {
   const queryClient = useQueryClient()
-  const toast = useToast()
+  const { toast } = useToast()
 
   return useMutation({
     mutationFn: async (id: string) => {

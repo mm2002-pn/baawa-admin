@@ -10,7 +10,7 @@ import { fr } from 'date-fns/locale'
 function TipsForSignalement({ signalementId }: { signalementId: string }) {
   const { data: tips, isLoading } = useTipsBySignalement(signalementId)
   const verifyTip = useVerifyTip()
-  const toast = useToast()
+  const { toast } = useToast()
 
   const handleVerify = async (tipId: string) => {
     try {

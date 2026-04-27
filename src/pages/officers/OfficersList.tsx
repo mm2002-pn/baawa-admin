@@ -16,7 +16,7 @@ export default function OfficersListPage() {
 
   const { data: officers, isLoading, error, refetch } = useOfficers()
   const deleteOfficer = useDeleteOfficer()
-  const toast = useToast()
+  const { toast } = useToast()
 
   const filteredOfficers = (officers ?? []).filter((officer) => {
     const matchSearch =
