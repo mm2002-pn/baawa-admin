@@ -36,7 +36,7 @@ export default function DashboardPage() {
           elapsed: hoursSinceCreation < 1
             ? 'Moins d\'1h'
             : `${Math.floor(hoursSinceCreation)}h`,
-          photoUrl: mp.photoUrl,
+          photoUrls: mp.photoUrls,
         }
       })
   }, [stats?.recentAlerts])

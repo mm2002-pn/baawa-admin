@@ -24,7 +24,7 @@ export default function CreateSignalementPage() {
     fullName: '',
     age: '',
     gender: 'MASCULIN',
-    photoUrl: '',
+    images: [] as File[],
     disappearanceDate: '',
     disappearanceTime: '',
     lastLatitude: '',
@@ -46,14 +46,21 @@ export default function CreateSignalementPage() {
     setError('')
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFormData(prev => ({ ...prev, images: Array.from(e.target.files!) }))
+      setError('')
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError('')
 
     try {
-      if (!formData.fullName || !formData.age || !formData.gender || !formData.photoUrl) {
-        setError('Veuillez remplir tous les champs obligatoires du profil')
+      if (!formData.fullName || !formData.age || !formData.gender || formData.images.length === 0) {
+        setError('Veuillez remplir tous les champs obligatoires du profil et ajouter au moins une photo')
         setIsLoading(false)
         return
       }
@@ -83,24 +90,29 @@ export default function CreateSignalementPage() {
         return
       }
 
-      const payload = {
-        fullName: formData.fullName,
-        age: parseInt(formData.age),
-        gender: formData.gender,
-        photoUrl: formData.photoUrl,
-        disappearanceDate: formData.disappearanceDate,
-        disappearanceTime: formData.disappearanceTime,
-        lastLatitude: parseFloat(formData.lastLatitude),
-        lastLongitude: parseFloat(formData.lastLongitude),
-        lastAddress: formData.lastAddress,
-        region: formData.region,
-        clothingDescription: formData.clothingDescription,
-        relationship: formData.relationship,
-        phoneNumber: formData.phoneNumber,
-        ...(formData.policeReportNumber && { policeReportNumber: formData.policeReportNumber }),
+      const data = new FormData()
+      
+      // Ajouter tous les champs textuels
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key !== 'images' && key !== 'policeReportNumber') {
+          data.append(key, value.toString())
+        }
+      })
+
+      // Ajouter le numéro de PV s'il existe
+      if (formData.policeReportNumber && formData.policeReportNumber.trim() !== '') {
+        data.append('policeReportNumber', formData.policeReportNumber)
       }
 
-      await apiClient.post('/signalements', payload)
+      // Ajouter les images
+      formData.images.forEach(file => {
+        data.append('images', file)
+      })
+
+      await apiClient.post('/signalements', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
       toast.success('Signalement créé avec succès')
       navigate('/signalements')
     } catch (err: any) {
@@ -167,17 +179,27 @@ export default function CreateSignalementPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">URL Photo *</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Photos (une ou plusieurs) *</label>
                 <input
-                  type="url"
-                  name="photoUrl"
-                  value={formData.photoUrl}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  placeholder="https://example.com/photo.jpg"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
-                <p className="text-xs text-slate-500 mt-2">Format: https://...</p>
+                <p className="text-xs text-slate-500 mt-2">Sélectionnez une ou plusieurs photos</p>
+                
+                {formData.images.length > 0 && (
+                  <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+                    {formData.images.map((file, i) => (
+                      <img 
+                        key={i} 
+                        src={URL.createObjectURL(file)} 
+                        className="h-16 w-16 rounded-lg object-cover border border-slate-100 shadow-sm"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

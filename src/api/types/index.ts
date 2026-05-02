@@ -75,7 +75,7 @@ export interface MissingPerson {
   fullName: string
   age: number
   gender: Gender
-  photoUrl: string
+  photoUrls: string[]
   disappearanceDate: string
   disappearanceTime: string
   lastLatitude: number
