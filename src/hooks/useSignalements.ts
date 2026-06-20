@@ -23,7 +23,8 @@ export const useSignalements = (
       params.append('page', page.toString())
       params.append('limit', limit.toString())
       if (filters?.search) params.append('search', filters.search)
-      if (filters?.status) params.append('status', filters.status)
+      // 'ALL' is the sentinel for "no status filter" in the UI — don't send it
+      if (filters?.status && filters.status !== 'ALL') params.append('status', filters.status)
       if (filters?.region) params.append('region', filters.region)
       if (filters?.alertStatus) params.append('alertStatus', filters.alertStatus)
 
