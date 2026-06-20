@@ -281,3 +281,15 @@ export interface ResolveSignalementDto {
 export interface VerifyTipDto {
   verified: boolean
 }
+
+// ========== NOTIFICATION TYPES ==========
+
+export interface AppNotification {
+  id: string
+  userId: string
+  title: string
+  message: string
+  type: string // INFO, ALERT, SUCCESS
+  isRead: boolean
+  createdAt: string
+}
