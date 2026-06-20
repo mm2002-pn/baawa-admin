@@ -19,6 +19,7 @@ export default function LoginPage() {
   const setAuth = useAuthStore((state) => state.setAuth)
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const {
     register,
@@ -27,171 +28,258 @@ export default function LoginPage() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: 'onBlur',
-    defaultValues: {
-      email: '',
-      password: '',
-    },
+    defaultValues: { email: '', password: '' },
   })
 
   const onSubmit = async (data: LoginFormData) => {
     try {
       setIsLoading(true)
       const response = await authService.login(data)
-
       const authData = response.data
       setAuth(authData.user, authData.accessToken, authData.refreshToken)
-      toast.success('Connexion réussie!')
-
-      setTimeout(() => {
-        navigate('/', { replace: true })
-      }, 100)
+      toast.success('Connexion réussie')
+      setTimeout(() => navigate('/', { replace: true }), 100)
     } catch (error: any) {
-      console.error('Login error:', error)
-      const message = error.response?.data?.message || 'Erreur lors de la connexion'
-      toast.error(message)
+      const message = error.response?.data?.message || 'Email ou mot de passe incorrect'
+      toast.error(typeof message === 'string' ? message : 'Erreur lors de la connexion')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-background">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0">
-        <img
-          alt="BAAWA Background"
-          className="w-full h-full object-cover"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0_JGuKWQVMJZMfr-s_edhj3XnBE1tC2npxgBSSTbr27Eg0R-ASWWN45PN5M89ScIK5-IfKqf3rdRDxzQ6kmed5XB2T0TakL5dRt5iOwmF0luoZJ_VKeFwbiwVFqRz5XC2PpXc8j47ZucjBmTUVUhvvZHai6HyqYDWjLtc4OyIle6zlgemVVZnIY6WGf7fjxiGYVUusVXFfAJ3ZvD8uueigziC249K8jAP1DPavXP7ZFpcy5WHRcZOmLOhepZfc3DTKTfeZ-pkVsRx"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-background/92 to-background/85 backdrop-blur-sm"></div>
-      </div>
+    <div className="min-h-screen flex bg-slate-50">
+      {/* Left Panel — Brand & Mission (hidden on mobile) */}
+      <aside className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800">
+        {/* Decorative pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+                <path d="M 48 0 L 0 0 0 48" fill="none" stroke="white" strokeWidth="1" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
 
-      {/* Login Container */}
-      <main className="relative z-10 w-full max-w-md">
-        <div className="bg-surface-container-lowest/90 backdrop-blur-xl p-8 md:p-12 rounded-lg shadow-2xl flex flex-col items-center">
-          {/* Logo Section */}
-          <div className="mb-10 text-center">
-            <div className="h-16 w-16 rounded-lg bg-primary flex items-center justify-center text-white font-headline font-bold text-2xl mx-auto mb-6">
-              BA
+        {/* Blurred orbs */}
+        <div className="absolute -top-20 -right-20 h-96 w-96 rounded-full bg-blue-400/30 blur-3xl" />
+        <div className="absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-blue-300/20 blur-3xl" />
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 text-white w-full">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl flex items-center justify-center">
+              <span className="material-symbols-outlined text-white text-[28px]">shield</span>
             </div>
-            <h1 className="font-headline font-bold text-primary text-2xl tracking-tight">
-              Content de vous revoir
+            <div>
+              <h2 className="text-2xl font-extrabold tracking-tight">BAAWA</h2>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-blue-100">
+                Centre de Commandement
+              </p>
+            </div>
+          </div>
+
+          {/* Mission */}
+          <div className="space-y-8 max-w-lg">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-200 mb-4">
+                Plateforme nationale
+              </p>
+              <h1 className="font-extrabold text-4xl xl:text-5xl leading-tight tracking-tight">
+                Retrouver chaque<br />
+                personne disparue<br />
+                au Sénégal.
+              </h1>
+              <p className="text-blue-100 text-base mt-6 leading-relaxed">
+                Coordination en temps réel entre citoyens, forces de l'ordre et
+                administration pour accélérer chaque signalement.
+              </p>
+            </div>
+
+            {/* Stats / Trust signals */}
+            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/15">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="material-symbols-outlined text-blue-200 text-lg">map</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-200">14 Régions</span>
+                </div>
+                <p className="text-xs text-blue-100/80">Couverture nationale</p>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="material-symbols-outlined text-blue-200 text-lg">bolt</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-200">Temps réel</span>
+                </div>
+                <p className="text-xs text-blue-100/80">Alertes instantanées</p>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="material-symbols-outlined text-blue-200 text-lg">verified_user</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-200">Sécurisé</span>
+                </div>
+                <p className="text-xs text-blue-100/80">Données chiffrées</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-blue-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)] animate-pulse" />
+            Système opérationnel
+          </div>
+        </div>
+      </aside>
+
+      {/* Right Panel — Form */}
+      <main className="flex-1 flex items-center justify-center p-6 sm:p-12">
+        <div className="w-full max-w-md">
+          {/* Mobile logo (visible only on small screens) */}
+          <div className="lg:hidden flex items-center gap-3 mb-12">
+            <div className="h-12 w-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+              <span className="material-symbols-outlined text-white text-[28px]">shield</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-extrabold text-slate-900">BAAWA</h2>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                Centre de Commandement
+              </p>
+            </div>
+          </div>
+
+          {/* Heading */}
+          <div className="mb-10">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 mb-3">
+              Espace personnel
+            </p>
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+              Bon retour parmi nous
             </h1>
-            <p className="text-on-surface-variant text-sm mt-2">
-              Accédez à votre tableau de bord BAAWA
+            <p className="text-slate-500 text-sm mt-3 leading-relaxed">
+              Connectez-vous à votre tableau de bord pour gérer les signalements
+              et coordonner les opérations.
             </p>
           </div>
 
-          {/* Login Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
-            {/* Email Field */}
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant font-label ml-1">
-                Email ou Identifiant
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                Adresse email
               </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">
-                  <span className="material-symbols-outlined text-[20px]">alternate_email</span>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                  <span className="material-symbols-outlined text-[20px]">mail</span>
                 </div>
                 <input
+                  id="email"
                   type="email"
+                  autoComplete="email"
                   {...register('email')}
-                  className="block w-full pl-11 pr-4 py-3.5 bg-surface-container-highest border-none rounded-lg text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary-fixed-dim transition-all duration-200"
-                  placeholder="nom@baawa.sn"
+                  className={`block w-full pl-12 pr-4 py-3.5 bg-white border rounded-xl text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 ${
+                    errors.email ? 'border-red-300 focus:border-red-500' : 'border-slate-200 focus:border-blue-600'
+                  }`}
+                  placeholder="admin@baawa.sn"
                 />
               </div>
               {errors.email && (
-                <p className="text-error text-xs mt-1 ml-1">{errors.email.message}</p>
+                <p className="text-red-600 text-xs mt-2 ml-1 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">error</span>
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
-            {/* Password Field */}
-            <div className="space-y-1.5">
-              <div className="flex justify-between items-center px-1">
-                <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant font-label">
+            {/* Password */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label htmlFor="password" className="block text-[11px] font-black uppercase tracking-widest text-slate-500">
                   Mot de passe
                 </label>
-                <a className="text-xs font-semibold text-primary hover:text-primary-container transition-colors" href="#">
-                  Mot de passe oublié ?
-                </a>
+                <button
+                  type="button"
+                  className="text-[11px] font-bold text-blue-600 hover:text-blue-700 hover:underline decoration-2 underline-offset-2 transition-colors"
+                  onClick={() => toast.info('Contactez votre administrateur')}
+                >
+                  Oublié ?
+                </button>
               </div>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                   <span className="material-symbols-outlined text-[20px]">lock</span>
                 </div>
                 <input
-                  type="password"
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   {...register('password')}
-                  className="block w-full pl-11 pr-4 py-3.5 bg-surface-container-highest border-none rounded-lg text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary-fixed-dim transition-all duration-200"
+                  className={`block w-full pl-12 pr-12 py-3.5 bg-white border rounded-xl text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 ${
+                    errors.password ? 'border-red-300 focus:border-red-500' : 'border-slate-200 focus:border-blue-600'
+                  }`}
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
               </div>
               {errors.password && (
-                <p className="text-error text-xs mt-1 ml-1">{errors.password.message}</p>
+                <p className="text-red-600 text-xs mt-2 ml-1 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">error</span>
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
-            {/* Remember Me */}
-            <div className="flex items-center space-x-2 px-1">
-              <input
-                type="checkbox"
-                id="remember"
-                className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary"
-              />
-              <label htmlFor="remember" className="text-sm text-on-surface-variant">
-                Se souvenir de moi
-              </label>
-            </div>
-
-            {/* Submit Button */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full text-white font-headline font-bold py-4 rounded-lg shadow-lg active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group bg-primary hover:bg-primary-dark shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm py-4 rounded-xl shadow-lg shadow-blue-600/25 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none mt-2"
             >
-              <span>{isLoading ? 'Connexion en cours...' : 'Se connecter'}</span>
-              {!isLoading && (
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
-                  arrow_forward
-                </span>
+              {isLoading ? (
+                <>
+                  <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+                  <span>Connexion en cours...</span>
+                </>
+              ) : (
+                <>
+                  <span>Se connecter</span>
+                  <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">
+                    arrow_forward
+                  </span>
+                </>
               )}
             </button>
           </form>
 
-          {/* Footer Info */}
-          <div className="mt-12 text-center">
-            <p className="text-sm text-on-surface-variant">
-              Nouveau sur la plateforme ?{' '}
-              <a className="text-primary font-bold hover:underline decoration-2 underline-offset-4" href="#">
-                Demander un accès
+          {/* Footer */}
+          <div className="mt-10 pt-6 border-t border-slate-100">
+            <p className="text-xs text-slate-500 text-center">
+              Accès réservé aux administrateurs et forces de l'ordre.
+              <br />
+              Pour toute demande,{' '}
+              <a
+                href="mailto:contact@baawa.sn"
+                className="font-bold text-blue-600 hover:text-blue-700 hover:underline decoration-2 underline-offset-2"
+              >
+                contactez-nous
               </a>
+              .
             </p>
           </div>
         </div>
-
-        {/* System Status */}
-        <div className="mt-8 flex justify-center items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-secondary"></div>
-            <span className="text-[10px] font-bold uppercase tracking-tighter text-on-surface-variant font-label">
-              Système Opérationnel
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[14px] text-tertiary">public</span>
-            <span className="text-[10px] font-bold uppercase tracking-tighter text-on-surface-variant font-label">
-              Impact Social Sénégal
-            </span>
-          </div>
-        </div>
       </main>
-
-      {/* Visual Accent */}
-      <div className="absolute bottom-10 right-10 z-0 opacity-10 hidden lg:block">
-        <span className="material-symbols-outlined text-[300px] text-primary select-none">
-          nature_people
-        </span>
-      </div>
     </div>
   )
 }
