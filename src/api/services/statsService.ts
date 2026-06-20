@@ -18,7 +18,10 @@ export interface DashboardStatsResponse {
       age: number
       region: string
       status: string
-      photoUrl: string
+      photoUrls: string[]
+      lastLatitude?: number
+      lastLongitude?: number
+      lastAddress?: string
     }
   }>
 }
@@ -31,11 +34,11 @@ export interface RegionStatsItem {
 export const statsService = {
   getDashboardStats: async (): Promise<DashboardStatsResponse> => {
     const response = await apiClient.get('/stats/dashboard')
-    return response as unknown as DashboardStatsResponse
+    return (response as any).data as DashboardStatsResponse
   },
 
   getRegionStats: async (): Promise<RegionStatsItem[]> => {
     const response = await apiClient.get('/stats/regions')
-    return response as unknown as RegionStatsItem[]
+    return (response as any).data as RegionStatsItem[]
   },
 }

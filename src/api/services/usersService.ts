@@ -1,6 +1,10 @@
 import { apiClient } from '../client'
 import { User, CreateUserDto, UpdateUserDto, PaginatedResponse } from '../types'
 
+// Backend wraps every response as { success, statusCode, message, data: <payload> }.
+// The axios interceptor already extracts response.data (the HTTP body), so each
+// service method still needs to read `.data` once more to reach the payload.
+
 export const usersService = {
   getAll: async (
     page = 1,
@@ -12,7 +16,6 @@ export const usersService = {
       limit: limit.toString(),
     })
 
-    // Ajouter les filtres seulement s'ils ont une valeur réelle
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
@@ -22,32 +25,27 @@ export const usersService = {
     }
 
     const response = await apiClient.get(`/users?${params.toString()}`)
-    return response as unknown as PaginatedResponse<User>
+    return (response as any).data as PaginatedResponse<User>
   },
 
   getById: async (id: string): Promise<User> => {
     const response = await apiClient.get(`/users/${id}`)
-    console.log('📊 getById response:', response)
-
-    // Backend returns wrapped response: { success, statusCode, message, data: { user } }
-    // response.data contains the user object
-    const userData = response.data || response
-    return userData as unknown as User
+    return (response as any).data as User
   },
 
   create: async (data: CreateUserDto): Promise<User> => {
     const response = await apiClient.post('/users', data)
-    return response as unknown as User
+    return (response as any).data as User
   },
 
   update: async (id: string, data: UpdateUserDto): Promise<User> => {
     const response = await apiClient.patch(`/users/${id}`, data)
-    return response as unknown as User
+    return (response as any).data as User
   },
 
   toggleActive: async (id: string): Promise<User> => {
     const response = await apiClient.patch(`/users/${id}/toggle-active`, {})
-    return response as unknown as User
+    return (response as any).data as User
   },
 
   delete: async (id: string): Promise<void> => {
@@ -59,6 +57,6 @@ export const usersService = {
     data: { badgeNumber: string; rank: string; policeUnit: string }
   ): Promise<any> => {
     const response = await apiClient.post(`/users/officers/${userId}`, data)
-    return response
+    return (response as any).data
   },
 }

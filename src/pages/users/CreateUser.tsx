@@ -26,7 +26,7 @@ export default function CreateUserPage() {
         onSuccess: (response) => {
           // If role is POLICIER, create officer profile
           if (data.role === 'POLICIER' && data.badgeNumber) {
-            const userId = response.data?.id || response.id
+            const userId = response.id
             createOfficerMutation.mutate(
               {
                 userId,

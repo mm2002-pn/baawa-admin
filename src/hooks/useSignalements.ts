@@ -1,65 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../api/client'
+import { signalementService } from '../api/services/signalementService'
 import { useToast } from './useToast'
+import { Signalement, PaginatedResponse } from '../api/types'
 
-export interface MissingPerson {
-  id: string
-  fullName: string
-  age: number
-  gender: 'MASCULIN' | 'FEMININ' | 'AUTRE'
-  photoUrl: string
-  disappearanceDate: string
-  disappearanceTime: string
-  lastLatitude: number
-  lastLongitude: number
-  lastAddress: string
-  region: string
-  clothingDescription: string
-  status: 'URGENT' | 'INFO_RECUE' | 'STANDARD' | 'RESOLVED'
-  viewCount: number
-  shareCount: number
-  createdAt: string
-  updatedAt: string
-  resolvedAt?: string
-}
-
-export interface Signalement {
-  id: string
-  missingPersonId: string
-  reporterId: string
-  relationship: string
-  phoneNumber: string
-  policeReportNumber?: string
-  status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'VERIFIED' | 'ARCHIVED'
-  createdAt: string
-  publishedAt?: string
-  verifiedAt?: string
-  updatedAt: string
-  missingPerson?: MissingPerson
-  reporter?: {
-    id: string
-    firstName: string
-    lastName: string
-    email: string
-    phoneNumber: string
-  }
-  tips?: Array<{
-    id: string
-    description: string
-    isVerified: boolean
-    createdAt: string
-  }>
-}
-
-export interface SignalementsResponse {
-  data: Signalement[]
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-  }
-}
+export type SignalementsResponse = PaginatedResponse<Signalement>
 
 export const useSignalements = (
   page: number = 1,
@@ -78,7 +23,8 @@ export const useSignalements = (
       params.append('page', page.toString())
       params.append('limit', limit.toString())
       if (filters?.search) params.append('search', filters.search)
-      if (filters?.status) params.append('status', filters.status)
+      // 'ALL' is the sentinel for "no status filter" in the UI — don't send it
+      if (filters?.status && filters.status !== 'ALL') params.append('status', filters.status)
       if (filters?.region) params.append('region', filters.region)
       if (filters?.alertStatus) params.append('alertStatus', filters.alertStatus)
 
@@ -103,7 +49,7 @@ export const useSignalement = (id: string) => {
 
 export const useVerifySignalement = () => {
   const queryClient = useQueryClient()
-  const toast = useToast()
+  const { toast } = useToast()
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -122,7 +68,7 @@ export const useVerifySignalement = () => {
 
 export const useResolveSignalement = () => {
   const queryClient = useQueryClient()
-  const toast = useToast()
+  const { toast } = useToast()
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -139,9 +85,28 @@ export const useResolveSignalement = () => {
   })
 }
 
+export const useMarkPersonAsFound = () => {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  return useMutation({
+    mutationFn: (personId: string) => signalementService.markPersonAsFound(personId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['signalements'] })
+      queryClient.invalidateQueries({ queryKey: ['signalement'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
+      toast.success('Personne marquée comme retrouvée. Tous les signalements liés sont archivés.')
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || 'Erreur lors du marquage'
+      toast.error(typeof message === 'string' ? message : 'Erreur lors du marquage')
+    },
+  })
+}
+
 export const useDeleteSignalement = () => {
   const queryClient = useQueryClient()
-  const toast = useToast()
+  const { toast } = useToast()
 
   return useMutation({
     mutationFn: async (id: string) => {

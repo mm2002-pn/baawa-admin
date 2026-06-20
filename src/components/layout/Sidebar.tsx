@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
+import { authService } from '../../api/services/authService'
 
 interface NavItem {
   label: string
@@ -24,9 +26,18 @@ interface SidebarProps {
 export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   const location = useLocation()
   const navigate = useNavigate()
-  const { logout } = useAuthStore()
+  const { logout, user } = useAuthStore()
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    // Best-effort: revoke refresh token server-side. Local state is cleared either way.
+    try {
+      await authService.logout()
+    } catch {
+      // ignore — user is logging out anyway
+    }
     logout()
     window.location.href = '/login'
   }
@@ -99,7 +110,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
             Nouveau signalement
           </button>
           <button
-            onClick={handleLogout}
+            onClick={() => setShowLogoutConfirm(true)}
             className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 w-full"
           >
             <span className="material-symbols-outlined">logout</span>
@@ -107,6 +118,63 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
           </button>
         </div>
       </aside>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div
+          className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => !isLoggingOut && setShowLogoutConfirm(false)}
+        >
+          <div
+            className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="p-6 flex flex-col items-center text-center border-b border-slate-100">
+              <div className="h-14 w-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-red-600 text-[28px]">logout</span>
+              </div>
+              <h3 className="text-lg font-extrabold text-slate-900">
+                Se déconnecter ?
+              </h3>
+              <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                {user?.firstName ? (
+                  <>Vous êtes connecté en tant que <strong className="text-slate-700">{user.firstName} {user.lastName}</strong>.<br /></>
+                ) : null}
+                Votre session sera terminée et vous serez redirigé vers la page de connexion.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="p-6 flex gap-3 bg-slate-50/50">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                disabled={isLoggingOut}
+                className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all disabled:opacity-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isLoggingOut ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                    Déconnexion...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[18px]">logout</span>
+                    Confirmer
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

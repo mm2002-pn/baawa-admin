@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { AdminLayout } from '../../components/layout/AdminLayout'
-import { useSignalement, useVerifySignalement, useResolveSignalement, useDeleteSignalement } from '../../hooks/useSignalements'
+import { useSignalement, useVerifySignalement, useMarkPersonAsFound, useDeleteSignalement } from '../../hooks/useSignalements'
 import { useState } from 'react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -12,8 +12,9 @@ export default function SignalementDetailsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const verifyMutation = useVerifySignalement()
-  const resolveMutation = useResolveSignalement()
+  const markFoundMutation = useMarkPersonAsFound()
   const deleteMutation = useDeleteSignalement()
+  const [showFoundConfirm, setShowFoundConfirm] = useState(false)
 
   const handleDelete = () => {
     if (!id) return
@@ -126,13 +127,14 @@ export default function SignalementDetailsPage() {
               {verifyMutation.isPending ? 'Vérification...' : 'Vérifier'}
             </button>
           )}
-          {signalement.status !== 'ARCHIVED' && (
+          {signalement.missingPerson?.status !== 'RESOLVED' && (
             <button
-              onClick={() => resolveMutation.mutate(signalement.id)}
-              disabled={resolveMutation.isPending}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors disabled:opacity-50"
+              onClick={() => setShowFoundConfirm(true)}
+              disabled={markFoundMutation.isPending}
+              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-sm transition-colors disabled:opacity-50 flex items-center gap-2"
             >
-              {resolveMutation.isPending ? 'Résolution...' : 'Résoudre'}
+              <span className="material-symbols-outlined text-lg">person_check</span>
+              Marquer retrouvée
             </button>
           )}
           <button
@@ -146,10 +148,10 @@ export default function SignalementDetailsPage() {
         {/* Photo & Info */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Photo */}
-          {mp?.photoUrl && (
+          {mp?.photoUrls?.[0] && (
             <div className="bg-white rounded-xl border border-slate-100 p-6">
               <img
-                src={mp.photoUrl}
+                src={mp.photoUrls[0]}
                 alt={mp.fullName}
                 className="w-full h-64 object-cover rounded-lg"
               />
@@ -157,7 +159,7 @@ export default function SignalementDetailsPage() {
           )}
 
           {/* Person Info */}
-          <div className={`bg-white rounded-xl border border-slate-100 p-6 ${mp?.photoUrl ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
+          <div className={`bg-white rounded-xl border border-slate-100 p-6 ${mp?.photoUrls?.[0] ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
             <h2 className="text-lg font-bold text-slate-900 mb-4">Informations de la Personne</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -313,6 +315,59 @@ export default function SignalementDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Mark as Found Confirmation */}
+      {showFoundConfirm && signalement.missingPerson && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+          onClick={() => !markFoundMutation.isPending && setShowFoundConfirm(false)}
+        >
+          <div
+            className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 flex flex-col items-center text-center border-b border-slate-100">
+              <div className="h-14 w-14 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-emerald-600 text-[28px]">person_check</span>
+              </div>
+              <h3 className="text-lg font-extrabold text-slate-900">
+                Marquer {signalement.missingPerson.fullName} comme retrouvée ?
+              </h3>
+              <ul className="text-sm text-slate-600 mt-4 space-y-1.5 text-left bg-slate-50 rounded-xl p-4 w-full">
+                <li className="flex items-start gap-2">
+                  <span className="material-symbols-outlined text-emerald-600 text-[18px] mt-0.5">check_circle</span>
+                  <span>Définir la personne comme <strong>retrouvée</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="material-symbols-outlined text-emerald-600 text-[18px] mt-0.5">check_circle</span>
+                  <span>Archiver <strong>tous les signalements</strong> liés à cette personne</span>
+                </li>
+              </ul>
+            </div>
+            <div className="p-6 flex gap-3 bg-slate-50/50">
+              <button
+                onClick={() => setShowFoundConfirm(false)}
+                disabled={markFoundMutation.isPending}
+                className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all disabled:opacity-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => {
+                  if (!signalement.missingPersonId) return
+                  markFoundMutation.mutate(signalement.missingPersonId, {
+                    onSuccess: () => setShowFoundConfirm(false),
+                  })
+                }}
+                disabled={markFoundMutation.isPending}
+                className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {markFoundMutation.isPending ? 'En cours...' : 'Confirmer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
