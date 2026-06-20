@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { AdminLayout } from '../../components/layout/AdminLayout'
 import { useUsers, useDeleteUser, useToggleUserActive } from '../../hooks/useUsers'
 import { User, Role } from '../../api/types'
@@ -50,23 +49,14 @@ export default function UsersListPage() {
     }
   }
 
+  const totalItems = data?.pagination?.total ?? 0
+  const totalPages = data?.pagination?.totalPages ?? 1
+
   if (error) {
     return (
       <AdminLayout title="Utilisateurs">
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <p className="text-slate-500 text-sm">{data?.total || 0} utilisateurs au total</p>
-            <button
-              onClick={() => navigate('/users/create')}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold text-sm shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2 justify-center"
-            >
-              <span className="material-symbols-outlined">add</span>
-              Créer un utilisateur
-            </button>
-          </div>
-          <div className="bg-white rounded-xl border border-slate-100 p-12 text-center">
-            <p className="text-red-600">Erreur lors du chargement des utilisateurs</p>
-          </div>
+        <div className="bg-white rounded-xl border border-slate-100 p-12 text-center">
+          <p className="text-red-600">Erreur lors du chargement des utilisateurs</p>
         </div>
       </AdminLayout>
     )
@@ -77,7 +67,7 @@ export default function UsersListPage() {
       <div className="space-y-6">
         {/* Header with Create Button */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <p className="text-slate-500 text-sm">{data?.total || 0} utilisateurs au total</p>
+          <p className="text-slate-500 text-sm">{totalItems} utilisateurs au total</p>
           <button
             onClick={() => {
               setSelectedUser(null)
@@ -351,10 +341,10 @@ export default function UsersListPage() {
           )}
 
           {/* Pagination */}
-          {data && data.total > 0 && (
+          {totalItems > 0 && (
             <div className="p-6 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-slate-600">
-                Affichage {(page - 1) * limit + 1} à {Math.min(page * limit, data.total)} sur {data.total} résultats
+                Affichage {(page - 1) * limit + 1} à {Math.min(page * limit, totalItems)} sur {totalItems} résultats
               </div>
               <div className="flex gap-2">
                 <button
@@ -366,10 +356,10 @@ export default function UsersListPage() {
                   Précédent
                 </button>
                 <span className="flex items-center px-4 text-sm font-bold text-slate-900">
-                  Page {page} sur {Math.ceil(data.total / limit)}
+                  Page {page} sur {totalPages}
                 </span>
                 <button
-                  disabled={page >= Math.ceil(data.total / limit)}
+                  disabled={page >= totalPages}
                   onClick={() => setPage(page + 1)}
                   className="px-4 py-2 text-sm font-bold text-blue-600 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >

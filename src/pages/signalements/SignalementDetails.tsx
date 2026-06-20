@@ -146,10 +146,10 @@ export default function SignalementDetailsPage() {
         {/* Photo & Info */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Photo */}
-          {mp?.photoUrl && (
+          {mp?.photoUrls?.[0] && (
             <div className="bg-white rounded-xl border border-slate-100 p-6">
               <img
-                src={mp.photoUrl}
+                src={mp.photoUrls[0]}
                 alt={mp.fullName}
                 className="w-full h-64 object-cover rounded-lg"
               />
@@ -157,7 +157,7 @@ export default function SignalementDetailsPage() {
           )}
 
           {/* Person Info */}
-          <div className={`bg-white rounded-xl border border-slate-100 p-6 ${mp?.photoUrl ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
+          <div className={`bg-white rounded-xl border border-slate-100 p-6 ${mp?.photoUrls?.[0] ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
             <h2 className="text-lg font-bold text-slate-900 mb-4">Informations de la Personne</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>

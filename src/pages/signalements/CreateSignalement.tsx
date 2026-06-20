@@ -87,7 +87,7 @@ export default function CreateSignalementPage() {
         fullName: formData.fullName,
         age: parseInt(formData.age),
         gender: formData.gender,
-        photoUrl: formData.photoUrl,
+        photoUrls: formData.photoUrl ? [formData.photoUrl] : [],
         disappearanceDate: formData.disappearanceDate,
         disappearanceTime: formData.disappearanceTime,
         lastLatitude: parseFloat(formData.lastLatitude),

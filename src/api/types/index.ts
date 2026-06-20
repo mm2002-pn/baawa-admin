@@ -75,7 +75,7 @@ export interface MissingPerson {
   fullName: string
   age: number
   gender: Gender
-  photoUrl: string
+  photoUrls: string[]
   disappearanceDate: string
   disappearanceTime: string
   lastLatitude: number
@@ -181,10 +181,12 @@ export interface ApiResponse<T> {
 
 export interface PaginatedResponse<T> {
   data: T[]
-  total: number
-  page: number
-  limit: number
-  hasMore: boolean
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
 }
 
 // ========== DASHBOARD TYPES ==========

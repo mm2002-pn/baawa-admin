@@ -1,65 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../api/client'
 import { useToast } from './useToast'
+import { Signalement, PaginatedResponse } from '../api/types'
 
-export interface MissingPerson {
-  id: string
-  fullName: string
-  age: number
-  gender: 'MASCULIN' | 'FEMININ' | 'AUTRE'
-  photoUrl: string
-  disappearanceDate: string
-  disappearanceTime: string
-  lastLatitude: number
-  lastLongitude: number
-  lastAddress: string
-  region: string
-  clothingDescription: string
-  status: 'URGENT' | 'INFO_RECUE' | 'STANDARD' | 'RESOLVED'
-  viewCount: number
-  shareCount: number
-  createdAt: string
-  updatedAt: string
-  resolvedAt?: string
-}
-
-export interface Signalement {
-  id: string
-  missingPersonId: string
-  reporterId: string
-  relationship: string
-  phoneNumber: string
-  policeReportNumber?: string
-  status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'VERIFIED' | 'ARCHIVED'
-  createdAt: string
-  publishedAt?: string
-  verifiedAt?: string
-  updatedAt: string
-  missingPerson?: MissingPerson
-  reporter?: {
-    id: string
-    firstName: string
-    lastName: string
-    email: string
-    phoneNumber: string
-  }
-  tips?: Array<{
-    id: string
-    description: string
-    isVerified: boolean
-    createdAt: string
-  }>
-}
-
-export interface SignalementsResponse {
-  data: Signalement[]
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-  }
-}
+export type SignalementsResponse = PaginatedResponse<Signalement>
 
 export const useSignalements = (
   page: number = 1,

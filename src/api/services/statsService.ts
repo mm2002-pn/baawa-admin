@@ -18,7 +18,7 @@ export interface DashboardStatsResponse {
       age: number
       region: string
       status: string
-      photoUrl: string
+      photoUrls: string[]
       lastLatitude?: number
       lastLongitude?: number
       lastAddress?: string

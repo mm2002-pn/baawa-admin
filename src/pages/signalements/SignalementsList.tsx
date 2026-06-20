@@ -173,9 +173,9 @@ export default function SignalementsListPage() {
                   >
                     <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
                       {/* Photo */}
-                      {mp?.photoUrl && (
+                      {mp?.photoUrls?.[0] && (
                         <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-slate-200 shadow-md">
-                          <img src={mp.photoUrl} alt={mp.fullName} className="w-full h-full object-cover" />
+                          <img src={mp.photoUrls[0]} alt={mp.fullName} className="w-full h-full object-cover" />
                         </div>
                       )}
 

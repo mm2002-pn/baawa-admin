@@ -85,9 +85,9 @@ export default function SignalementDetailsDrawer({ isOpen, onClose, signalement 
           <div className="p-8 bg-gradient-to-br from-slate-50 to-white border-b border-slate-100">
             <div className="flex gap-6 items-start">
               <div className="h-24 w-24 rounded-2xl overflow-hidden shadow-xl ring-4 ring-white flex-shrink-0">
-                <img 
-                  src={mp?.photoUrl || 'https://via.placeholder.com/150'} 
-                  alt={mp?.fullName} 
+                <img
+                  src={mp?.photoUrls?.[0] || 'https://via.placeholder.com/150'}
+                  alt={mp?.fullName}
                   className="w-full h-full object-cover"
                 />
               </div>

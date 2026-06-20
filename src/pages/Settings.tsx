@@ -40,7 +40,7 @@ export default function SettingsPage() {
       title: 'Gestion des Utilisateurs',
       description: 'Ajouter, modifier ou supprimer des utilisateurs du système',
       icon: 'people',
-      count: usersData?.total || 0,
+      count: usersData?.pagination?.total ?? 0,
       action: 'Gérer',
     },
     {
@@ -138,7 +138,7 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { label: 'Version', value: 'v1.0.0' },
-              { label: 'Utilisateurs Actifs', value: usersData?.total || '0' },
+              { label: 'Utilisateurs Actifs', value: usersData?.pagination?.total ?? '0' },
               { label: 'Dernière Mise à Jour', value: 'Il y a 2h' },
               { label: 'Statut Système', value: 'Opérationnel' },
             ].map((info, idx) => (

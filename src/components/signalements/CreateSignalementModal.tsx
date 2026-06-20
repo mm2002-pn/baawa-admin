@@ -98,8 +98,10 @@ export default function CreateSignalementModal({ isOpen, onClose, onSuccess }: C
 
     setIsLoading(true)
     try {
+      const { photoUrl, ...rest } = formData
       const payload: any = {
-        ...formData,
+        ...rest,
+        photoUrls: photoUrl ? [photoUrl] : [],
         age: parseInt(formData.age),
         lastLatitude: parseFloat(formData.lastLatitude),
         lastLongitude: parseFloat(formData.lastLongitude),
