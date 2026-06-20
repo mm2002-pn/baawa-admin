@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../api/client'
+import { signalementService } from '../api/services/signalementService'
 import { useToast } from './useToast'
 import { Signalement, PaginatedResponse } from '../api/types'
 
@@ -79,6 +80,25 @@ export const useResolveSignalement = () => {
     },
     onError: () => {
       toast.error('Erreur lors de la résolution du signalement')
+    },
+  })
+}
+
+export const useMarkPersonAsFound = () => {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  return useMutation({
+    mutationFn: (personId: string) => signalementService.markPersonAsFound(personId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['signalements'] })
+      queryClient.invalidateQueries({ queryKey: ['signalement'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
+      toast.success('Personne marquée comme retrouvée. Tous les signalements liés sont archivés.')
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || 'Erreur lors du marquage'
+      toast.error(typeof message === 'string' ? message : 'Erreur lors du marquage')
     },
   })
 }

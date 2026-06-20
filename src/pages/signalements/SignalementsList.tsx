@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AdminLayout } from '../../components/layout/AdminLayout'
-import { useSignalements, useResolveSignalement, useVerifySignalement, useDeleteSignalement } from '../../hooks/useSignalements'
+import { useSignalements, useVerifySignalement, useDeleteSignalement } from '../../hooks/useSignalements'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import CreateSignalementModal from '../../components/signalements/CreateSignalementModal'
@@ -27,7 +27,6 @@ export default function SignalementsListPage() {
   })
 
   const verifyMutation = useVerifySignalement()
-  const resolveMutation = useResolveSignalement()
   const deleteMutation = useDeleteSignalement()
 
   const handleDelete = (id: string) => {
@@ -231,15 +230,6 @@ export default function SignalementsListPage() {
                               className="px-3 py-2 text-sm font-bold text-green-600 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50"
                             >
                               Vérifier
-                            </button>
-                          )}
-                          {signalement.status !== 'ARCHIVED' && (
-                            <button
-                              onClick={() => resolveMutation.mutate(signalement.id)}
-                              disabled={resolveMutation.isPending}
-                              className="px-3 py-2 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
-                            >
-                              Résoudre
                             </button>
                           )}
                           <button

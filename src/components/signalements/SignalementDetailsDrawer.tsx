@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { Signalement } from '../../api/types'
-import { useResolveSignalement, useVerifySignalement, useDeleteSignalement } from '../../hooks/useSignalements'
+import { useMarkPersonAsFound, useVerifySignalement, useDeleteSignalement } from '../../hooks/useSignalements'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -23,13 +24,24 @@ interface SignalementDetailsDrawerProps {
 
 export default function SignalementDetailsDrawer({ isOpen, onClose, signalement }: SignalementDetailsDrawerProps) {
   const verifyMutation = useVerifySignalement()
-  const resolveMutation = useResolveSignalement()
+  const markFoundMutation = useMarkPersonAsFound()
   const deleteMutation = useDeleteSignalement()
+  const [showFoundConfirm, setShowFoundConfirm] = useState(false)
 
   if (!signalement) return null
 
   const mp = signalement.missingPerson
   const reporter = signalement.reporter
+
+  const handleMarkAsFound = () => {
+    if (!signalement.missingPersonId) return
+    markFoundMutation.mutate(signalement.missingPersonId, {
+      onSuccess: () => {
+        setShowFoundConfirm(false)
+        onClose()
+      },
+    })
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -218,17 +230,17 @@ export default function SignalementDetailsDrawer({ isOpen, onClose, signalement 
               Vérifier
             </button>
           )}
-          {signalement.status !== 'ARCHIVED' && (
-            <button 
-              onClick={() => resolveMutation.mutate(signalement.id)}
-              disabled={resolveMutation.isPending}
-              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          {mp?.status !== 'RESOLVED' && (
+            <button
+              onClick={() => setShowFoundConfirm(true)}
+              disabled={markFoundMutation.isPending}
+              className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              <span className="material-symbols-outlined text-lg">verified</span>
-              Résoudre
+              <span className="material-symbols-outlined text-lg">person_check</span>
+              Marquer retrouvée
             </button>
           )}
-          <button 
+          <button
             onClick={() => deleteMutation.mutate(signalement.id, { onSuccess: onClose })}
             disabled={deleteMutation.isPending}
             className="px-4 py-3 bg-red-50 text-red-600 border border-red-100 rounded-xl font-bold text-sm hover:bg-red-100 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
@@ -238,6 +250,71 @@ export default function SignalementDetailsDrawer({ isOpen, onClose, signalement 
           </button>
         </div>
       </div>
+
+      {/* Mark as Found Confirmation */}
+      {showFoundConfirm && (
+        <div
+          className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => !markFoundMutation.isPending && setShowFoundConfirm(false)}
+        >
+          <div
+            className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 flex flex-col items-center text-center border-b border-slate-100">
+              <div className="h-14 w-14 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-emerald-600 text-[28px]">person_check</span>
+              </div>
+              <h3 className="text-lg font-extrabold text-slate-900">
+                Marquer {mp?.fullName || 'cette personne'} comme retrouvée ?
+              </h3>
+              <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                Cette action va :
+              </p>
+              <ul className="text-sm text-slate-600 mt-3 space-y-1.5 text-left bg-slate-50 rounded-xl p-4 w-full">
+                <li className="flex items-start gap-2">
+                  <span className="material-symbols-outlined text-emerald-600 text-[18px] mt-0.5">check_circle</span>
+                  <span>Définir la personne comme <strong>retrouvée</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="material-symbols-outlined text-emerald-600 text-[18px] mt-0.5">check_circle</span>
+                  <span>Archiver <strong>tous les signalements</strong> liés à cette personne</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="material-symbols-outlined text-amber-600 text-[18px] mt-0.5">info</span>
+                  <span className="text-slate-500">Action irréversible depuis l'interface</span>
+                </li>
+              </ul>
+            </div>
+            <div className="p-6 flex gap-3 bg-slate-50/50">
+              <button
+                onClick={() => setShowFoundConfirm(false)}
+                disabled={markFoundMutation.isPending}
+                className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all disabled:opacity-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleMarkAsFound}
+                disabled={markFoundMutation.isPending}
+                className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {markFoundMutation.isPending ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                    En cours...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[18px]">person_check</span>
+                    Confirmer
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

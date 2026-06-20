@@ -73,4 +73,9 @@ export const signalementService = {
     const response = await apiClient.patch(`/signalements/${id}/archive`, {})
     return response as unknown as Signalement
   },
+
+  markPersonAsFound: async (personId: string) => {
+    const response = await apiClient.patch(`/signalements/person/${personId}/found`, {})
+    return response as unknown as { id: string; status: string; resolvedAt: string }
+  },
 }
