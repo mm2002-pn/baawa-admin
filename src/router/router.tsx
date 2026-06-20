@@ -17,6 +17,7 @@ const CreateSignalementPage = lazy(() => import('../pages/signalements/CreateSig
 const SignalementDetailsPage = lazy(() => import('../pages/signalements/SignalementDetails'))
 const TipsPage = lazy(() => import('../pages/tips/TipsList'))
 const SettingsPage = lazy(() => import('../pages/Settings'))
+const NotificationsSettingsPage = lazy(() => import('../pages/settings/NotificationsSettings'))
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -143,6 +144,16 @@ export const router = createBrowserRouter([
       <ProtectedRoute>
         <Suspense fallback={<LoadingFallback />}>
           <SettingsPage />
+        </Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/settings/notifications',
+    element: (
+      <ProtectedRoute>
+        <Suspense fallback={<LoadingFallback />}>
+          <NotificationsSettingsPage />
         </Suspense>
       </ProtectedRoute>
     ),

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { useAuthStore } from '../store/authStore'
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3000'
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL,
@@ -46,7 +46,7 @@ apiClient.interceptors.response.use(
             refresh_token: refreshToken,
           })
 
-          const { accessToken: newAccessToken } = response.data
+          const newAccessToken = response.data.data?.accessToken || response.data.accessToken
           useAuthStore.getState().setAccessToken(newAccessToken)
 
           // Retry original request

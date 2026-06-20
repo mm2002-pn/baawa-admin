@@ -15,7 +15,7 @@ export default function SettingsPage() {
         navigate('/users')
         break
       case 2:
-        alert('Notifications - Fonctionnalité en cours de développement')
+        navigate('/settings/notifications')
         break
       case 3:
         alert('Sécurité - Fonctionnalité en cours de développement')
