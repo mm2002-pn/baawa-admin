@@ -353,3 +353,22 @@ export interface SchoolUser {
   isActive: boolean
   createdAt: string
 }
+
+// ========== GPS / POSITIONS ==========
+
+export interface TraccarPosition {
+  deviceId: number
+  latitude: number
+  longitude: number
+  speed: number
+  fixTime: string
+  address?: string | null
+}
+
+export interface StudentPositionEntry {
+  studentId: string
+  firstName: string
+  lastName: string
+  traccarDeviceId: number | null
+  position: TraccarPosition | null
+}
