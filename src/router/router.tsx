@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { ProtectedRoute } from './ProtectedRoute'
 import { lazy, Suspense } from 'react'
+import { Role } from '../api/types'
 
 // Pages
 import LoginPage from '../pages/auth/Login'
@@ -17,6 +18,11 @@ const CreateSignalementPage = lazy(() => import('../pages/signalements/CreateSig
 const SignalementDetailsPage = lazy(() => import('../pages/signalements/SignalementDetails'))
 const TipsPage = lazy(() => import('../pages/tips/TipsList'))
 const SettingsPage = lazy(() => import('../pages/Settings'))
+const SchoolsPage = lazy(() => import('../pages/schools/SchoolsList'))
+const SchoolDetailsAdminPage = lazy(() => import('../pages/schools/SchoolDetails'))
+const StudentsPage = lazy(() => import('../pages/school/StudentsList'))
+const MySchoolPage = lazy(() => import('../pages/school/MySchool'))
+const SchoolUsersPage = lazy(() => import('../pages/school/SchoolUsers'))
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -32,7 +38,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <DashboardPage />
       </ProtectedRoute>
     ),
@@ -144,6 +150,46 @@ export const router = createBrowserRouter([
         <Suspense fallback={<LoadingFallback />}>
           <SettingsPage />
         </Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/schools',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
+        <Suspense fallback={<LoadingFallback />}><SchoolsPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/schools/:id',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
+        <Suspense fallback={<LoadingFallback />}><SchoolDetailsAdminPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/students',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
+        <Suspense fallback={<LoadingFallback />}><StudentsPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/my-school',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
+        <Suspense fallback={<LoadingFallback />}><MySchoolPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/school-users',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
+        <Suspense fallback={<LoadingFallback />}><SchoolUsersPage /></Suspense>
       </ProtectedRoute>
     ),
   },
