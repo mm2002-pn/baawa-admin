@@ -35,12 +35,14 @@ export function RoleBadge({ role }: RoleBadgeProps) {
     [Role.CITOYEN]: 'info',
     [Role.POLICIER]: 'warning',
     [Role.ADMIN_BAAWA]: 'danger',
+    [Role.ADMIN_SCHOOL]: 'danger',
   }
 
   const labelMap: Record<Role, string> = {
     [Role.CITOYEN]: 'Citoyen',
     [Role.POLICIER]: 'Policier',
     [Role.ADMIN_BAAWA]: 'Admin',
+    [Role.ADMIN_SCHOOL]: 'Admin École',
   }
 
   return <Badge variant={variantMap[role]}>{labelMap[role]}</Badge>

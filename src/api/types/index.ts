@@ -4,6 +4,7 @@ export enum Role {
   CITOYEN = 'CITOYEN',
   POLICIER = 'POLICIER',
   ADMIN_BAAWA = 'ADMIN_BAAWA',
+  ADMIN_SCHOOL = 'ADMIN_SCHOOL',
 }
 
 export enum Gender {
@@ -280,4 +281,74 @@ export interface ResolveSignalementDto {
 
 export interface VerifyTipDto {
   verified: boolean
+}
+
+// ========== SCHOOL TYPES ==========
+
+export interface School {
+  id: string
+  name: string
+  address?: string
+  region?: string
+  phoneNumber?: string
+  email?: string
+  isActive: boolean
+  createdAt: string
+  _count?: { students: number; users: number }
+}
+
+export interface Student {
+  id: string
+  schoolId: string
+  firstName: string
+  lastName: string
+  className?: string
+  gender?: Gender
+  birthDate?: string | null
+  photoUrl?: string | null
+  parentName?: string
+  parentPhone?: string
+  imei?: string | null
+  isActive: boolean
+  createdAt: string
+}
+
+export interface CreateSchoolDto {
+  name: string
+  address?: string
+  region?: string
+  phoneNumber?: string
+  email?: string
+}
+
+export interface CreateSchoolUserDto {
+  email: string
+  firstName: string
+  lastName: string
+  phoneNumber: string
+}
+
+export interface CreateStudentDto {
+  firstName: string
+  lastName: string
+  className?: string
+  gender?: Gender
+  birthDate?: string
+  photoUrl?: string
+  parentName?: string
+  parentPhone?: string
+  imei?: string
+}
+
+export type UpdateStudentDto = Partial<CreateStudentDto>
+
+export interface SchoolUser {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  phoneNumber: string
+  role: Role
+  isActive: boolean
+  createdAt: string
 }
