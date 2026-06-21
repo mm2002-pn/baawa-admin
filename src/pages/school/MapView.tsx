@@ -20,7 +20,7 @@ Icon.Default.mergeOptions({
 const SENEGAL_CENTER: [number, number] = [14.7167, -17.4677]
 
 export default function MapViewPage() {
-  const { data: entries, isLoading } = useStudentPositions()
+  const { data: entries, isLoading, isError } = useStudentPositions()
   const located = (entries ?? []).filter((e) => e.position)
   const unlocated = (entries ?? []).filter((e) => !e.position)
 
@@ -29,7 +29,7 @@ export default function MapViewPage() {
       <div className="bg-white border border-slate-100 rounded-xl overflow-hidden mb-4" style={{ height: 480 }}>
         <MapContainer center={SENEGAL_CENTER} zoom={7} style={{ height: '100%', width: '100%' }}>
           <TileLayer
-            attribution='&copy; OpenStreetMap'
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {located.map((e) => (
@@ -44,7 +44,9 @@ export default function MapViewPage() {
         </MapContainer>
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <p className="text-red-600 text-sm">Impossible de récupérer les positions. Réessai automatique…</p>
+      ) : isLoading ? (
         <p className="text-slate-400">Chargement…</p>
       ) : (
         <div className="bg-white border border-slate-100 rounded-xl p-4">
