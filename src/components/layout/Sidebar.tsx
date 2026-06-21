@@ -20,6 +20,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { label: 'Écoles', href: '/schools', icon: 'school', roles: [Role.ADMIN_BAAWA] },
   { label: 'Mon école', href: '/my-school', icon: 'school', roles: [Role.ADMIN_SCHOOL] },
   { label: 'Élèves', href: '/students', icon: 'groups', roles: [Role.ADMIN_SCHOOL] },
+  { label: 'Carte', href: '/map', icon: 'map', roles: [Role.ADMIN_SCHOOL] },
   { label: 'Utilisateurs', href: '/school-users', icon: 'people', roles: [Role.ADMIN_SCHOOL] },
   { label: 'Paramètres', href: '/settings', icon: 'settings', roles: [Role.ADMIN_BAAWA] },
 ]
