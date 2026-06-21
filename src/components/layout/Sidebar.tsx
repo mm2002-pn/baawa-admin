@@ -2,20 +2,26 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { authService } from '../../api/services/authService'
+import { Role } from '../../api/types'
 
 interface NavItem {
   label: string
   href: string
   icon: string
+  roles: Role[]
 }
 
-const navItems: NavItem[] = [
-  { label: 'Tableau de bord', href: '/', icon: 'dashboard' },
-  { label: 'Utilisateurs', href: '/users', icon: 'people' },
-  { label: 'Policiers', href: '/officers', icon: 'local_police' },
-  { label: 'Signalements', href: '/signalements', icon: 'person_search' },
-  { label: 'Témoignages', href: '/tips', icon: 'record_voice_over' },
-  { label: 'Paramètres', href: '/settings', icon: 'settings' },
+const ALL_NAV_ITEMS: NavItem[] = [
+  { label: 'Tableau de bord', href: '/', icon: 'dashboard', roles: [Role.ADMIN_BAAWA, Role.POLICIER] },
+  { label: 'Utilisateurs', href: '/users', icon: 'people', roles: [Role.ADMIN_BAAWA] },
+  { label: 'Policiers', href: '/officers', icon: 'local_police', roles: [Role.ADMIN_BAAWA] },
+  { label: 'Signalements', href: '/signalements', icon: 'person_search', roles: [Role.ADMIN_BAAWA, Role.POLICIER] },
+  { label: 'Témoignages', href: '/tips', icon: 'record_voice_over', roles: [Role.ADMIN_BAAWA, Role.POLICIER] },
+  { label: 'Écoles', href: '/schools', icon: 'school', roles: [Role.ADMIN_BAAWA] },
+  { label: 'Mon école', href: '/my-school', icon: 'school', roles: [Role.ADMIN_SCHOOL] },
+  { label: 'Élèves', href: '/students', icon: 'groups', roles: [Role.ADMIN_SCHOOL] },
+  { label: 'Utilisateurs', href: '/school-users', icon: 'people', roles: [Role.ADMIN_SCHOOL] },
+  { label: 'Paramètres', href: '/settings', icon: 'settings', roles: [Role.ADMIN_BAAWA] },
 ]
 
 interface SidebarProps {
@@ -27,6 +33,9 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const { logout, user } = useAuthStore()
+  const navItems = ALL_NAV_ITEMS.filter(
+    (item) => !user?.role || item.roles.includes(user.role as Role),
+  )
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -99,16 +108,18 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
 
         {/* Footer Actions */}
         <div className="mt-auto space-y-4">
-          <button
-            onClick={() => {
-              navigate('/signalements/create')
-              onClose?.()
-            }}
-            className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-bold text-sm shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:bg-blue-700 transition-all"
-          >
-            <span className="material-symbols-outlined text-lg">add_alert</span>
-            Nouveau signalement
-          </button>
+          {user?.role !== Role.ADMIN_SCHOOL && (
+            <button
+              onClick={() => {
+                navigate('/signalements/create')
+                onClose?.()
+              }}
+              className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-bold text-sm shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:bg-blue-700 transition-all"
+            >
+              <span className="material-symbols-outlined text-lg">add_alert</span>
+              Nouveau signalement
+            </button>
+          )}
           <button
             onClick={() => setShowLogoutConfirm(true)}
             className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 w-full"

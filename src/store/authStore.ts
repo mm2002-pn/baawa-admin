@@ -13,6 +13,7 @@ export interface AuthState {
   setUser: (user: User) => void
   logout: () => void
   isAdmin: () => boolean
+  isSchoolAdmin: () => boolean
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -52,6 +53,11 @@ export const useAuthStore = create<AuthState>()(
       isAdmin: () => {
         const state = get()
         return state.user?.role === Role.ADMIN_BAAWA
+      },
+
+      isSchoolAdmin: () => {
+        const state = get()
+        return state.user?.role === Role.ADMIN_SCHOOL
       },
     }),
     {

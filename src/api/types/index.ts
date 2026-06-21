@@ -53,6 +53,7 @@ export interface User {
   updatedAt?: string
   lastLoginAt?: string | null
   officer?: Officer
+  schoolId?: string | null
 }
 
 export interface Officer {
