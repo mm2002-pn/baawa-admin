@@ -46,7 +46,7 @@ export const router = createBrowserRouter([
   {
     path: '/users',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <UsersPage />
         </Suspense>
@@ -56,7 +56,7 @@ export const router = createBrowserRouter([
   {
     path: '/users/create',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <CreateUserPage />
         </Suspense>
@@ -66,7 +66,7 @@ export const router = createBrowserRouter([
   {
     path: '/users/:id',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <UserDetailsPage />
         </Suspense>
@@ -76,7 +76,7 @@ export const router = createBrowserRouter([
   {
     path: '/users/:id/edit',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <EditUserPage />
         </Suspense>
@@ -86,7 +86,7 @@ export const router = createBrowserRouter([
   {
     path: '/officers',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <OfficersPage />
         </Suspense>
@@ -96,7 +96,7 @@ export const router = createBrowserRouter([
   {
     path: '/cases',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <Suspense fallback={<LoadingFallback />}>
           <SignalementsPage />
         </Suspense>
@@ -106,7 +106,7 @@ export const router = createBrowserRouter([
   {
     path: '/signalements',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <Suspense fallback={<LoadingFallback />}>
           <SignalementsPage />
         </Suspense>
@@ -116,7 +116,7 @@ export const router = createBrowserRouter([
   {
     path: '/signalements/create',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <Suspense fallback={<LoadingFallback />}>
           <CreateSignalementPage />
         </Suspense>
@@ -126,7 +126,7 @@ export const router = createBrowserRouter([
   {
     path: '/signalements/:id',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <Suspense fallback={<LoadingFallback />}>
           <SignalementDetailsPage />
         </Suspense>
@@ -136,7 +136,7 @@ export const router = createBrowserRouter([
   {
     path: '/tips',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <Suspense fallback={<LoadingFallback />}>
           <TipsPage />
         </Suspense>
@@ -146,7 +146,7 @@ export const router = createBrowserRouter([
   {
     path: '/settings',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <SettingsPage />
         </Suspense>
