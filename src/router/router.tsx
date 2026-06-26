@@ -23,6 +23,7 @@ const SchoolDetailsAdminPage = lazy(() => import('../pages/schools/SchoolDetails
 const StudentsPage = lazy(() => import('../pages/school/StudentsList'))
 const MySchoolPage = lazy(() => import('../pages/school/MySchool'))
 const SchoolUsersPage = lazy(() => import('../pages/school/SchoolUsers'))
+const MapViewPage = lazy(() => import('../pages/school/MapView'))
 const NotificationsSettingsPage = lazy(() => import('../pages/settings/NotificationsSettings'))
 
 const LoadingFallback = () => (
@@ -191,6 +192,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
         <Suspense fallback={<LoadingFallback />}><SchoolUsersPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/map',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
+        <Suspense fallback={<LoadingFallback />}><MapViewPage /></Suspense>
       </ProtectedRoute>
     ),
   },
