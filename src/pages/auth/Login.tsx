@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { useAuthStore } from '../../store/authStore'
 import { useToast } from '../../hooks/useToast'
 import { authService } from '../../api/services/authService'
+import logoBaawa from '../../assets/baawa.jpg'
 
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -71,8 +72,8 @@ export default function LoginPage() {
         <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 text-white w-full">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl flex items-center justify-center">
-              <span className="material-symbols-outlined text-white text-[28px]">shield</span>
+            <div className="h-12 w-12 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl overflow-hidden flex items-center justify-center">
+              <img src={logoBaawa} alt="BAAWA Logo" className="h-full w-full object-cover" />
             </div>
             <div>
               <h2 className="text-2xl font-extrabold tracking-tight">BAAWA</h2>

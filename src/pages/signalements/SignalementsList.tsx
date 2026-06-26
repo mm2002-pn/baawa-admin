@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AdminLayout } from '../../components/layout/AdminLayout'
 import { useSignalements, useVerifySignalement, useDeleteSignalement } from '../../hooks/useSignalements'
 import { format } from 'date-fns'
@@ -17,7 +17,16 @@ export default function SignalementsListPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const isCreateModalOpen = searchParams.get('create') === 'true'
+  const setIsCreateModalOpen = (open: boolean) => {
+    if (open) {
+      searchParams.set('create', 'true')
+    } else {
+      searchParams.delete('create')
+    }
+    setSearchParams(searchParams, { replace: true })
+  }
   const [selectedSignalement, setSelectedSignalement] = useState<Signalement | null>(null)
   const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false)
 
@@ -172,7 +181,7 @@ export default function SignalementsListPage() {
                   >
                     <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
                       {/* Photo */}
-                      {mp?.photoUrls?.[0] && (
+                      {mp?.photoUrls && mp.photoUrls.length > 0 && (
                         <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-slate-200 shadow-md">
                           <img src={mp.photoUrls[0]} alt={mp.fullName} className="w-full h-full object-cover" />
                         </div>

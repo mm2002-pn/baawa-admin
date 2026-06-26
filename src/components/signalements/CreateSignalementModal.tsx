@@ -29,7 +29,7 @@ export default function CreateSignalementModal({ isOpen, onClose, onSuccess }: C
     fullName: '',
     age: '',
     gender: 'MASCULIN',
-    photoUrl: '',
+    images: [] as File[],
     disappearanceDate: '',
     disappearanceTime: '',
     lastLatitude: '',
@@ -43,6 +43,13 @@ export default function CreateSignalementModal({ isOpen, onClose, onSuccess }: C
   })
 
   if (!isOpen) return null
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFormData(prev => ({ ...prev, images: Array.from(e.target.files!) }))
+      setError('')
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -61,8 +68,8 @@ export default function CreateSignalementModal({ isOpen, onClose, onSuccess }: C
 
   const nextStep = () => {
     if (step === 1) {
-      if (!formData.fullName || !formData.age || !formData.photoUrl) {
-        setError('Veuillez remplir tous les champs obligatoires du profil')
+      if (!formData.fullName || !formData.age || formData.images.length === 0) {
+        setError('Veuillez remplir tous les champs obligatoires et ajouter au moins une photo')
         return
       }
     } else if (step === 2) {
@@ -98,21 +105,29 @@ export default function CreateSignalementModal({ isOpen, onClose, onSuccess }: C
 
     setIsLoading(true)
     try {
-      const { photoUrl, ...rest } = formData
-      const payload: any = {
-        ...rest,
-        photoUrls: photoUrl ? [photoUrl] : [],
-        age: parseInt(formData.age),
-        lastLatitude: parseFloat(formData.lastLatitude),
-        lastLongitude: parseFloat(formData.lastLongitude),
+      const data = new FormData()
+      
+      // Ajouter tous les champs textuels
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key !== 'images' && key !== 'policeReportNumber') {
+          data.append(key, value.toString())
+        }
+      })
+
+      // Ajouter le numéro de PV s'il existe
+      if (formData.policeReportNumber && formData.policeReportNumber.trim() !== '') {
+        data.append('policeReportNumber', formData.policeReportNumber)
       }
 
-      // Ne pas envoyer le numéro de PV s'il est vide pour éviter l'erreur de format
-      if (!payload.policeReportNumber || payload.policeReportNumber.trim() === '') {
-        delete payload.policeReportNumber
-      }
+      // Ajouter les images
+      formData.images.forEach(file => {
+        data.append('images', file)
+      })
 
-      await apiClient.post('/signalements', payload)
+      await apiClient.post('/signalements', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      
       toast.success('Signalement créé avec succès')
       onSuccess()
       onClose()
@@ -175,8 +190,36 @@ export default function CreateSignalementModal({ isOpen, onClose, onSuccess }: C
                   </select>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">URL Photo *</label>
-                  <input type="url" name="photoUrl" value={formData.photoUrl} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none transition-all" placeholder="https://example.com/photo.jpg" />
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Photos (une ou plusieurs) *</label>
+                  <div className="relative group">
+                    <input 
+                      type="file" 
+                      multiple 
+                      accept="image/*"
+                      onChange={handleFileChange} 
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="w-full px-4 py-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl group-hover:border-blue-400 transition-all flex flex-col items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-3xl text-slate-400 group-hover:text-blue-500 transition-colors">add_a_photo</span>
+                      <p className="text-sm font-bold text-slate-500">
+                        {formData.images.length > 0 
+                          ? `${formData.images.length} photo(s) sélectionnée(s)` 
+                          : 'Cliquez pour ajouter des photos'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  {formData.images.length > 0 && (
+                    <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+                      {formData.images.map((file, i) => (
+                        <img 
+                          key={i} 
+                          src={URL.createObjectURL(file)} 
+                          className="h-16 w-16 rounded-xl object-cover border border-slate-200 shadow-sm"
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -238,7 +281,9 @@ export default function CreateSignalementModal({ isOpen, onClose, onSuccess }: C
               <div className="space-y-6">
                 <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
                   <div className="flex items-center gap-4">
-                    <img src={formData.photoUrl} className="h-16 w-16 rounded-full object-cover ring-2 ring-white shadow-md" />
+                    {formData.images.length > 0 && (
+                      <img src={URL.createObjectURL(formData.images[0])} className="h-16 w-16 rounded-full object-cover ring-2 ring-white shadow-md" />
+                    )}
                     <div>
                       <p className="font-extrabold text-slate-900">{formData.fullName}</p>
                       <p className="text-sm text-slate-500 font-bold">{formData.age} ans • {formData.region}</p>

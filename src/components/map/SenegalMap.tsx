@@ -51,7 +51,7 @@ interface AlertMarker {
   location: string
   type: 'critical' | 'recent' | 'unit'
   elapsed?: string
-  photoUrl?: string
+  photoUrls?: string[]
 }
 
 interface SenegalMapProps {
@@ -157,9 +157,9 @@ export default function SenegalMap({ markers = [], height = '320px' }: SenegalMa
           >
             <Popup>
               <div className="text-sm min-w-[150px]">
-                {marker.photoUrl && (
+                {marker.photoUrls && marker.photoUrls.length > 0 && (
                   <img
-                    src={marker.photoUrl}
+                    src={marker.photoUrls[0]}
                     alt={marker.name}
                     className="w-16 h-16 object-cover rounded-lg mb-2 mx-auto"
                   />

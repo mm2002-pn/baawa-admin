@@ -24,6 +24,7 @@ const StudentsPage = lazy(() => import('../pages/school/StudentsList'))
 const MySchoolPage = lazy(() => import('../pages/school/MySchool'))
 const SchoolUsersPage = lazy(() => import('../pages/school/SchoolUsers'))
 const MapViewPage = lazy(() => import('../pages/school/MapView'))
+const NotificationsSettingsPage = lazy(() => import('../pages/settings/NotificationsSettings'))
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -199,6 +200,16 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
         <Suspense fallback={<LoadingFallback />}><MapViewPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/settings/notifications',
+    element: (
+      <ProtectedRoute>
+        <Suspense fallback={<LoadingFallback />}>
+          <NotificationsSettingsPage />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
