@@ -353,3 +353,15 @@ export interface SchoolUser {
   isActive: boolean
   createdAt: string
 }
+
+// ========== NOTIFICATION TYPES ==========
+
+export interface AppNotification {
+  id: string
+  userId: string
+  title: string
+  message: string
+  type: string // INFO, ALERT, SUCCESS
+  isRead: boolean
+  createdAt: string
+}

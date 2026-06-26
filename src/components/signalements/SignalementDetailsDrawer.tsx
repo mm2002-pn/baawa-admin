@@ -95,27 +95,40 @@ export default function SignalementDetailsDrawer({ isOpen, onClose, signalement 
         <div className="flex-1 overflow-y-auto">
           {/* Profile Header */}
           <div className="p-8 bg-gradient-to-br from-slate-50 to-white border-b border-slate-100">
-            <div className="flex gap-6 items-start">
-              <div className="h-24 w-24 rounded-2xl overflow-hidden shadow-xl ring-4 ring-white flex-shrink-0">
-                <img
-                  src={mp?.photoUrls?.[0] || 'https://via.placeholder.com/150'}
-                  alt={mp?.fullName}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="pt-2">
-                <h3 className="text-2xl font-black text-slate-900 mb-1">{mp?.fullName}</h3>
-                <div className="flex flex-wrap gap-y-2 gap-x-4">
-                  <span className="flex items-center gap-1.5 text-slate-600 font-bold text-sm">
-                    <span className="material-symbols-outlined text-lg text-blue-600">person</span>
-                    {mp?.age} ans • {mp?.gender}
-                  </span>
-                  <span className="flex items-center gap-1.5 text-slate-600 font-bold text-sm">
-                    <span className="material-symbols-outlined text-lg text-red-600">location_on</span>
-                    {mp?.region}
-                  </span>
+            <div className="flex flex-col gap-6">
+              <div className="flex gap-6 items-start">
+                <div className="h-24 w-24 rounded-2xl overflow-hidden shadow-xl ring-4 ring-white flex-shrink-0 bg-slate-200">
+                  <img 
+                    src={mp?.photoUrls?.[0] || 'https://via.placeholder.com/150'} 
+                    alt={mp?.fullName} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="pt-2">
+                  <h3 className="text-2xl font-black text-slate-900 mb-1">{mp?.fullName}</h3>
+                  <div className="flex flex-wrap gap-y-2 gap-x-4">
+                    <span className="flex items-center gap-1.5 text-slate-600 font-bold text-sm">
+                      <span className="material-symbols-outlined text-lg text-blue-600">person</span>
+                      {mp?.age} ans • {mp?.gender}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-slate-600 font-bold text-sm">
+                      <span className="material-symbols-outlined text-lg text-red-600">location_on</span>
+                      {mp?.region}
+                    </span>
+                  </div>
                 </div>
               </div>
+
+              {/* Galerie d'images secondaires si présentes */}
+              {mp?.photoUrls && mp.photoUrls.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {mp.photoUrls.map((url, i) => (
+                    <div key={i} className="h-16 w-16 rounded-xl overflow-hidden shadow-sm flex-shrink-0 border border-white ring-1 ring-slate-100">
+                      <img src={url} className="w-full h-full object-cover" alt={`${mp.fullName} - ${i + 1}`} />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
