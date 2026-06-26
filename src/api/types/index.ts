@@ -54,6 +54,7 @@ export interface User {
   lastLoginAt?: string | null
   officer?: Officer
   schoolId?: string | null
+  mustChangePassword?: boolean
 }
 
 export interface Officer {

@@ -6,6 +6,7 @@ import { Role } from '../api/types'
 // Pages
 import LoginPage from '../pages/auth/Login'
 import DashboardPage from '../pages/Dashboard'
+import ChangePasswordPage from '../pages/auth/ChangePassword'
 
 // Lazy loaded pages
 const UsersPage = lazy(() => import('../pages/users/UsersList'))
@@ -36,6 +37,14 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/change-password',
+    element: (
+      <ProtectedRoute>
+        <ChangePasswordPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/',

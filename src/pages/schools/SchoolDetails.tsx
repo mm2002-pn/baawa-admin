@@ -9,10 +9,16 @@ export default function SchoolDetailsPage() {
   const { data: students } = useSchoolStudents(id)
   const createAdmin = useCreateSchoolAdmin(id)
   const [form, setForm] = useState({ email: '', firstName: '', lastName: '', phoneNumber: '' })
+  const [created, setCreated] = useState<{ email: string; tempPassword: string } | null>(null)
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
-    createAdmin.mutate(form, { onSuccess: () => setForm({ email: '', firstName: '', lastName: '', phoneNumber: '' }) })
+    createAdmin.mutate(form, {
+      onSuccess: (data: any) => {
+        setForm({ email: '', firstName: '', lastName: '', phoneNumber: '' })
+        if (data?.tempPassword) setCreated({ email: data.email, tempPassword: data.tempPassword })
+      },
+    })
   }
 
   if (isLoading) return <AdminLayout title="École"><p className="text-slate-400">Chargement…</p></AdminLayout>
@@ -33,9 +39,28 @@ export default function SchoolDetailsPage() {
           <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email *" className="px-3 py-2 border border-slate-200 rounded-lg" />
           <input required value={form.phoneNumber} onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })} placeholder="Téléphone *" className="px-3 py-2 border border-slate-200 rounded-lg" />
           <button type="submit" disabled={createAdmin.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold col-span-2 disabled:opacity-50">
-            Créer le compte (mot de passe envoyé par email)
+            Créer le compte
           </button>
         </form>
+
+        {created && (
+          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+            <p className="text-sm font-bold text-amber-800">Compte créé — notez ces identifiants</p>
+            <p className="text-xs text-amber-700 mt-1">
+              Ce mot de passe temporaire ne sera plus affiché. Communiquez-le à l'utilisateur ; il devra le changer à sa première connexion.
+            </p>
+            <div className="mt-3 grid grid-cols-1 gap-1 text-sm">
+              <div><span className="text-amber-700">Identifiant :</span> <code className="font-mono">{created.email}</code></div>
+              <div><span className="text-amber-700">Mot de passe temporaire :</span> <code className="font-mono font-bold">{created.tempPassword}</code></div>
+            </div>
+            <button
+              onClick={() => navigator.clipboard?.writeText(created.tempPassword)}
+              className="mt-3 px-3 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700"
+            >
+              Copier le mot de passe
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="bg-white border border-slate-100 rounded-xl p-6">
