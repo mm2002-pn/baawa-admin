@@ -1,6 +1,7 @@
 import { ReactNode, useState } from 'react'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
+import { useRealtimeNotifications } from '../../hooks/useRealtimeNotifications'
 
 interface AdminLayoutProps {
   children: ReactNode
@@ -9,6 +10,9 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children, title }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // Connexion WebSocket temps réel (notifications + alertes Command Center)
+  useRealtimeNotifications()
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">

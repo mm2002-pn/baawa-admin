@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { authService } from '../../api/services/authService'
+import logoBaawa from '../../assets/baawa.jpg'
 
 interface NavItem {
   label: string
@@ -65,7 +66,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         <div className="flex flex-col gap-2 mb-10 px-2">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="material-symbols-outlined text-white">shield</span>
+              <img src={logoBaawa} alt="BAAWA Logo" className="h-full w-full object-cover" />
             </div>
             <div>
               <h2 className="text-lg font-extrabold text-slate-900">
@@ -101,7 +102,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         <div className="mt-auto space-y-4">
           <button
             onClick={() => {
-              navigate('/signalements/create')
+              navigate('/signalements?create=true')
               onClose?.()
             }}
             className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-bold text-sm shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 hover:bg-blue-700 transition-all"
