@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { ProtectedRoute } from './ProtectedRoute'
 import { lazy, Suspense } from 'react'
+import { Role } from '../api/types'
 
 // Pages
 import LoginPage from '../pages/auth/Login'
@@ -17,6 +18,11 @@ const CreateSignalementPage = lazy(() => import('../pages/signalements/CreateSig
 const SignalementDetailsPage = lazy(() => import('../pages/signalements/SignalementDetails'))
 const TipsPage = lazy(() => import('../pages/tips/TipsList'))
 const SettingsPage = lazy(() => import('../pages/Settings'))
+const SchoolsPage = lazy(() => import('../pages/schools/SchoolsList'))
+const SchoolDetailsAdminPage = lazy(() => import('../pages/schools/SchoolDetails'))
+const StudentsPage = lazy(() => import('../pages/school/StudentsList'))
+const MySchoolPage = lazy(() => import('../pages/school/MySchool'))
+const SchoolUsersPage = lazy(() => import('../pages/school/SchoolUsers'))
 const NotificationsSettingsPage = lazy(() => import('../pages/settings/NotificationsSettings'))
 
 const LoadingFallback = () => (
@@ -33,7 +39,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <DashboardPage />
       </ProtectedRoute>
     ),
@@ -41,7 +47,7 @@ export const router = createBrowserRouter([
   {
     path: '/users',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <UsersPage />
         </Suspense>
@@ -51,7 +57,7 @@ export const router = createBrowserRouter([
   {
     path: '/users/create',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <CreateUserPage />
         </Suspense>
@@ -61,7 +67,7 @@ export const router = createBrowserRouter([
   {
     path: '/users/:id',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <UserDetailsPage />
         </Suspense>
@@ -71,7 +77,7 @@ export const router = createBrowserRouter([
   {
     path: '/users/:id/edit',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <EditUserPage />
         </Suspense>
@@ -81,7 +87,7 @@ export const router = createBrowserRouter([
   {
     path: '/officers',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <OfficersPage />
         </Suspense>
@@ -91,7 +97,7 @@ export const router = createBrowserRouter([
   {
     path: '/cases',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <Suspense fallback={<LoadingFallback />}>
           <SignalementsPage />
         </Suspense>
@@ -101,7 +107,7 @@ export const router = createBrowserRouter([
   {
     path: '/signalements',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <Suspense fallback={<LoadingFallback />}>
           <SignalementsPage />
         </Suspense>
@@ -111,7 +117,7 @@ export const router = createBrowserRouter([
   {
     path: '/signalements/create',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <Suspense fallback={<LoadingFallback />}>
           <CreateSignalementPage />
         </Suspense>
@@ -121,7 +127,7 @@ export const router = createBrowserRouter([
   {
     path: '/signalements/:id',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <Suspense fallback={<LoadingFallback />}>
           <SignalementDetailsPage />
         </Suspense>
@@ -131,7 +137,7 @@ export const router = createBrowserRouter([
   {
     path: '/tips',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA, Role.POLICIER]}>
         <Suspense fallback={<LoadingFallback />}>
           <TipsPage />
         </Suspense>
@@ -141,10 +147,50 @@ export const router = createBrowserRouter([
   {
     path: '/settings',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}>
           <SettingsPage />
         </Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/schools',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
+        <Suspense fallback={<LoadingFallback />}><SchoolsPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/schools/:id',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
+        <Suspense fallback={<LoadingFallback />}><SchoolDetailsAdminPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/students',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
+        <Suspense fallback={<LoadingFallback />}><StudentsPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/my-school',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
+        <Suspense fallback={<LoadingFallback />}><MySchoolPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/school-users',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
+        <Suspense fallback={<LoadingFallback />}><SchoolUsersPage /></Suspense>
       </ProtectedRoute>
     ),
   },

@@ -7,20 +7,20 @@ interface ProtectedRouteProps {
   allowedRoles?: Role[]
 }
 
-// Roles allowed to access the admin panel
-const ADMIN_ROLES = [Role.ADMIN_BAAWA, Role.POLICIER]
+// Tous les rôles pouvant accéder à une partie quelconque du panel
+const PANEL_ROLES = [Role.ADMIN_BAAWA, Role.POLICIER, Role.ADMIN_SCHOOL]
 
-export function ProtectedRoute({ children, allowedRoles = ADMIN_ROLES }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, allowedRoles = PANEL_ROLES }: ProtectedRouteProps) {
   const { isAuthenticated, user } = useAuthStore()
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
 
-  // Check if user's role is in the allowed roles
   if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
-    // CITOYEN users cannot access admin panel
-    return <Navigate to="/login" replace />
+    // Rediriger un école vers ses élèves, sinon vers l'accueil
+    const fallback = user.role === Role.ADMIN_SCHOOL ? '/students' : '/'
+    return <Navigate to={fallback} replace />
   }
 
   return <>{children}</>
