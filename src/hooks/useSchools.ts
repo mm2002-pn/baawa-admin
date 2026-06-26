@@ -38,7 +38,7 @@ export function useCreateSchoolAdmin(schoolId: string) {
     mutationFn: (data: CreateSchoolUserDto) => schoolsService.createAdmin(schoolId, data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['schools', schoolId] })
-      toast.success('Compte admin créé — mot de passe envoyé par email')
+      toast.success('Compte admin créé — notez le mot de passe temporaire affiché')
     },
     onError: (e: any) => toast.error(e.response?.data?.message || 'Erreur lors de la création du compte'),
   })

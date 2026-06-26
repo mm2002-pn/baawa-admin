@@ -20,6 +20,10 @@ export const authService = {
     await apiClient.post('/auth/logout')
   },
 
+  changePassword: async (newPassword: string): Promise<void> => {
+    await apiClient.post('/auth/change-password', { newPassword })
+  },
+
   refreshToken: async (refreshToken: string): Promise<{ accessToken: string }> => {
     const response = await apiClient.post('/auth/refresh', { refreshToken })
     return response as unknown as { accessToken: string }

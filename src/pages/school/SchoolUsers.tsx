@@ -11,12 +11,14 @@ export default function SchoolUsersPage() {
   const { toast } = useToast()
   const { data: users, isLoading } = useQuery({ queryKey: ['my-school', 'users'], queryFn: mySchoolService.getUsers })
   const [form, setForm] = useState(EMPTY)
+  const [created, setCreated] = useState<{ email: string; tempPassword: string } | null>(null)
 
   const createUser = useMutation({
     mutationFn: () => mySchoolService.createUser(form),
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       qc.invalidateQueries({ queryKey: ['my-school', 'users'] })
-      toast.success('Utilisateur créé — mot de passe envoyé par email')
+      toast.success('Utilisateur créé — notez le mot de passe temporaire affiché')
+      if (data?.tempPassword) setCreated({ email: data.email, tempPassword: data.tempPassword })
       setForm(EMPTY)
     },
     onError: (e: any) => toast.error(e.response?.data?.message || 'Erreur lors de la création'),
@@ -31,6 +33,25 @@ export default function SchoolUsersPage() {
         <input required value={form.phoneNumber} onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })} placeholder="Téléphone *" className="px-3 py-2 border border-slate-200 rounded-lg" />
         <button type="submit" disabled={createUser.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold col-span-2 disabled:opacity-50">Créer l'utilisateur</button>
       </form>
+
+      {created && (
+        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm font-bold text-amber-800">Utilisateur créé — notez ces identifiants</p>
+          <p className="text-xs text-amber-700 mt-1">
+            Ce mot de passe temporaire ne sera plus affiché. Communiquez-le à l'utilisateur ; il devra le changer à sa première connexion.
+          </p>
+          <div className="mt-3 grid grid-cols-1 gap-1 text-sm">
+            <div><span className="text-amber-700">Identifiant :</span> <code className="font-mono">{created.email}</code></div>
+            <div><span className="text-amber-700">Mot de passe temporaire :</span> <code className="font-mono font-bold">{created.tempPassword}</code></div>
+          </div>
+          <button
+            onClick={() => navigator.clipboard?.writeText(created.tempPassword)}
+            className="mt-3 px-3 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700"
+          >
+            Copier le mot de passe
+          </button>
+        </div>
+      )}
 
       {isLoading ? (
         <p className="text-slate-400">Chargement…</p>
