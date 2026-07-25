@@ -6,9 +6,10 @@ import { useRealtimeNotifications } from '../../hooks/useRealtimeNotifications'
 interface AdminLayoutProps {
   children: ReactNode
   title?: string
+  backTo?: string
 }
 
-export function AdminLayout({ children, title }: AdminLayoutProps) {
+export function AdminLayout({ children, title, backTo }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Connexion WebSocket temps réel (notifications + alertes Command Center)
@@ -19,10 +20,10 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-72">
-        <Header title={title} onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+        <Header title={title} backTo={backTo} onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
         <main className="flex-1 overflow-y-auto">
-          <div className="p-6 lg:p-8">
+          <div className="p-4 lg:p-6">
             {children}
           </div>
         </main>
