@@ -203,6 +203,32 @@ export default function SignalementDetailsDrawer({ isOpen, onClose, signalement 
               </div>
             </section>
 
+            {/* Camera Info (when person found) */}
+            {(mp?.cameraName || mp?.cameraImageUrl) && (
+              <section>
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm">videocam</span>
+                  Preuve de découverte
+                </h4>
+                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 space-y-4">
+                  {mp?.cameraName && (
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase">Source caméra</label>
+                      <p className="text-sm font-bold text-slate-700">{mp.cameraName}</p>
+                    </div>
+                  )}
+                  {mp?.cameraImageUrl && (
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase mb-2">Image caméra</label>
+                      <div className="h-48 w-full rounded-xl overflow-hidden shadow-md border border-slate-200">
+                        <img src={mp.cameraImageUrl} alt="Image caméra" className="w-full h-full object-cover" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+
             {/* Timeline/History */}
             <section>
               <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
