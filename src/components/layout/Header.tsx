@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useNotifications } from '../../hooks/useNotifications'
 import { AppNotification } from '../../api/types'
 
 interface HeaderProps {
   title?: string
+  backTo?: string
   onMenuClick?: () => void
 }
 
@@ -25,7 +27,7 @@ const typeStyles: Record<string, string> = {
   INFO: 'bg-blue-100 text-blue-600',
 }
 
-export function Header({ title, onMenuClick }: HeaderProps) {
+export function Header({ title, backTo, onMenuClick }: HeaderProps) {
   const { user } = useAuthStore()
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
   const [open, setOpen] = useState(false)
@@ -52,6 +54,16 @@ export function Header({ title, onMenuClick }: HeaderProps) {
         >
           <span className="material-symbols-outlined">menu</span>
         </button>
+
+        {backTo && (
+          <Link
+            to={backTo}
+            aria-label="Retour"
+            className="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+          </Link>
+        )}
 
         {title && (
           <h1 className="text-xl font-bold text-slate-900">{title}</h1>
