@@ -89,6 +89,8 @@ export interface MissingPerson {
   status: AlertStatus
   viewCount: number
   shareCount: number
+  cameraName?: string | null
+  cameraImageUrl?: string | null
   createdAt: string
   updatedAt: string
   resolvedAt?: string | null

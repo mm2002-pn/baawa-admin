@@ -214,6 +214,17 @@ export default function SignalementsListPage() {
                             <span className="material-symbols-outlined text-base">phone</span>
                             {signalement.phoneNumber || '-'}
                           </div>
+                          {mp?.cameraName && (
+                            <div className="flex items-center gap-2 text-slate-600">
+                              <span className="material-symbols-outlined text-base">videocam</span>
+                              {mp.cameraName}
+                            </div>
+                          )}
+                          {mp?.cameraImageUrl && (
+                            <div className="flex items-center gap-2">
+                              <img src={mp.cameraImageUrl} alt="Camera" className="h-6 w-6 rounded object-cover ring-1 ring-slate-200" title="Image caméra" />
+                            </div>
+                          )}
                         </div>
                       </div>
 
