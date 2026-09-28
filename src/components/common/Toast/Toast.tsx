@@ -30,10 +30,10 @@ const iconMap = {
 }
 
 const colorMap = {
-  success: 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-900 dark:text-green-200',
-  error: 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-200',
-  info: 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-200',
-  warning: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-900 dark:text-yellow-200',
+  success: 'border-green-500 bg-green-50 dark:bg-green-950 text-green-900 dark:text-green-100',
+  error: 'border-red-500 bg-red-50 dark:bg-red-950 text-red-900 dark:text-red-100',
+  info: 'border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-900 dark:text-blue-100',
+  warning: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950 text-yellow-900 dark:text-yellow-100',
 }
 
 export function Toast({ toast }: ToastProps) {
