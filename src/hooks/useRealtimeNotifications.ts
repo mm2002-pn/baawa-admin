@@ -10,13 +10,16 @@ const SOCKET_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 let socket: Socket | null = null
 
 /** Affiche une notification native du bureau si l'utilisateur a donné la permission. */
-function showDesktopNotification(title: string, body: string) {
+function showDesktopNotification(title: string, body: string, urgent = false) {
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
   try {
     const notif = new Notification(title, {
       body,
       icon: baawaIcon,
-      tag: 'baawa', // évite l'empilement de doublons
+      // Une alarme urgente a son propre tag (ne remplace pas / n'est pas remplacée)
+      // et reste affichée jusqu'à une action de l'utilisateur.
+      tag: urgent ? `baawa-alarm-${Date.now()}` : 'baawa',
+      requireInteraction: urgent,
     })
     notif.onclick = () => {
       window.focus()
@@ -54,10 +57,17 @@ export function useRealtimeNotifications() {
 
     // Canal canonique : une notification ciblée (room privée). Sert de source
     // unique pour le toast, le badge et le popup bureau.
-    socket.on('notification', (notif: { title?: string; message?: string }) => {
+    socket.on('notification', (notif: { title?: string; message?: string; type?: string }) => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       const title = notif?.title ?? 'BAAWA'
       const message = notif?.message ?? ''
+      if (notif?.type === 'TRACKER_ALARM') {
+        // Alarme d'un traceur élève (SOS, chute…) : toast rouge qui reste affiché
+        toast.error(title, 30_000)
+        queryClient.invalidateQueries({ queryKey: ['student-positions'] })
+        showDesktopNotification(title, message, true)
+        return
+      }
       toast.info(message || title)
       showDesktopNotification(title, message)
     })

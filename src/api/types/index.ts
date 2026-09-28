@@ -366,7 +366,11 @@ export interface TraccarPosition {
   speed: number
   fixTime: string
   address?: string | null
+  batteryLevel: number | null
+  charging: boolean | null
 }
+
+export type TrackerStatus = 'online' | 'offline' | 'unknown'
 
 export interface StudentPositionEntry {
   studentId: string
@@ -374,6 +378,8 @@ export interface StudentPositionEntry {
   lastName: string
   traccarDeviceId: number | null
   position: TraccarPosition | null
+  deviceStatus: TrackerStatus
+  lastUpdate: string | null
 }
 
 // ========== NOTIFICATION TYPES ==========

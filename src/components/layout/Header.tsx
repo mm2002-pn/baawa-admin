@@ -25,6 +25,33 @@ const typeStyles: Record<string, string> = {
   ALERT: 'bg-red-100 text-red-600',
   SUCCESS: 'bg-green-100 text-green-600',
   INFO: 'bg-blue-100 text-blue-600',
+  TRACKER_ALARM: 'bg-red-600 text-white',
+}
+
+const typeLabels: Record<string, string> = {
+  TRACKER_ALARM: 'TRACEUR',
+}
+
+/** Rend les URLs d'un message cliquables (ex. lien Google Maps d'une alarme traceur). */
+function linkify(text: string) {
+  return text.split(/(https?:\/\/\S+)/g).map((part, i) =>
+    /^https?:\/\//.test(part) ? (
+      // Pas de <a> : l'élément parent est un <button> (liens imbriqués invalides)
+      <span
+        key={i}
+        role="link"
+        className="text-primary underline cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation()
+          window.open(part, '_blank', 'noopener,noreferrer')
+        }}
+      >
+        voir sur la carte
+      </span>
+    ) : (
+      part
+    ),
+  )
 }
 
 export function Header({ title, backTo, onMenuClick }: HeaderProps) {
@@ -137,10 +164,10 @@ export function Header({ title, backTo, onMenuClick }: HeaderProps) {
                               typeStyles[n.type] ?? 'bg-slate-100 text-slate-500'
                             }`}
                           >
-                            {n.type}
+                            {typeLabels[n.type] ?? n.type}
                           </span>
                         </span>
-                        <span className="block text-xs text-slate-500 mt-0.5">{n.message}</span>
+                        <span className="block text-xs text-slate-500 mt-0.5">{linkify(n.message)}</span>
                         <span className="block text-[10px] text-slate-400 mt-1">
                           {timeAgo(n.createdAt)}
                         </span>
