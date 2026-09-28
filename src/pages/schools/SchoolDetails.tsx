@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import { AdminLayout } from '../../components/layout/AdminLayout'
 import { useSchool, useCreateSchoolAdmin, useSchoolStudents } from '../../hooks/useSchools'
 
@@ -47,6 +49,7 @@ export default function SchoolDetailsPage() {
     { icon: 'phone', value: school?.phoneNumber },
     { icon: 'mail', value: school?.email },
     { icon: 'home', value: school?.address },
+    { icon: 'calendar_today', value: school?.createdAt ? `Depuis le ${format(new Date(school.createdAt), 'd MMMM yyyy', { locale: fr })}` : undefined },
   ]
 
   return (
@@ -61,7 +64,19 @@ export default function SchoolDetailsPage() {
             <div className="flex items-center justify-center w-[66px] h-[66px] rounded-[18px] bg-gradient-to-br from-[#2563eb] to-[#1e40af] text-white font-extrabold text-[22px] shadow-[0_12px_24px_-10px_rgba(37,99,235,.6)]">
               {school?.name ? initialsOf(school.name) : '—'}
             </div>
-            <h2 className="text-2xl font-extrabold tracking-[-0.02em] text-[#101828] mt-4">{school?.name}</h2>
+            <div className="flex items-center gap-3 mt-4">
+              <h2 className="text-2xl font-extrabold tracking-[-0.02em] text-[#101828]">{school?.name}</h2>
+              {school && (
+                <span
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                    school.isActive ? 'bg-[#ecfdf3] text-[#067647]' : 'bg-[#f5f6f8] text-[#667085]'
+                  }`}
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${school.isActive ? 'bg-[#12b76a]' : 'bg-[#98a2b3]'}`} />
+                  {school.isActive ? 'Active' : 'Inactive'}
+                </span>
+              )}
+            </div>
             <div className="flex flex-wrap gap-[10px] mt-4">
               {chips.map((chip) => (
                 <span
@@ -158,11 +173,23 @@ export default function SchoolDetailsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-[14.5px] text-[#101828] truncate">{st.firstName} {st.lastName}</p>
-                    <p className="text-[12.5px] text-[#98a2b3]">Élève</p>
+                    <p className="text-[12.5px] text-[#98a2b3] truncate">
+                      {st.parentName || st.parentPhone
+                        ? [st.parentName, st.parentPhone].filter(Boolean).join(' · ')
+                        : 'Élève'}
+                    </p>
                   </div>
-                  <span className="px-[13px] py-[6px] rounded-full bg-[#f1f2f4] text-[#475467] font-bold text-sm shrink-0">
-                    {st.className || '—'}
-                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {st.imei && (
+                      <span className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#f2f6ff] text-[#2563eb] font-bold text-xs" title={`IMEI ${st.imei}`}>
+                        <span className="material-symbols-outlined text-[14px]">gps_fixed</span>
+                        {st.imei}
+                      </span>
+                    )}
+                    <span className="px-[13px] py-1.5 rounded-full bg-[#f1f2f4] text-[#475467] font-bold text-sm">
+                      {st.className || '—'}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
