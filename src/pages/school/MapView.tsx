@@ -32,12 +32,12 @@ function StatusBadge({ status }: { status: TrackerStatus }) {
 }
 
 function batteryText(position: TraccarPosition | null): string {
-  if (!position || position.batteryLevel === null) return '—'
+  if (!position || position.batteryLevel == null) return '—'
   return `${position.batteryLevel} %${position.charging ? ' (en charge)' : ''}`
 }
 
 function batteryClass(position: TraccarPosition | null): string {
-  if (!position || position.batteryLevel === null) return 'text-slate-400'
+  if (!position || position.batteryLevel == null) return 'text-slate-400'
   if (position.batteryLevel <= 20) return 'text-red-600 font-semibold'
   if (position.batteryLevel <= 40) return 'text-amber-600'
   return 'text-slate-700'
