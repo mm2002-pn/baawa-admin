@@ -158,7 +158,7 @@ export default function SignalementDetailsDrawer({ isOpen, onClose, signalement 
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-2">Localisation sur la carte</label>
-                  <div className="h-48 w-full rounded-xl overflow-hidden border border-slate-200 shadow-inner z-0">
+                  <div className="relative isolate h-48 w-full rounded-xl overflow-hidden border border-slate-200 shadow-inner">
                     <MapContainer 
                       center={[mp?.lastLatitude || 14.7167, mp?.lastLongitude || -17.4677]} 
                       zoom={15} 

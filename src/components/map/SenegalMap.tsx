@@ -136,7 +136,7 @@ export default function SenegalMap({ markers = [], height = '320px' }: SenegalMa
   }
 
   return (
-    <div className="relative" style={{ height }}>
+    <div className="relative isolate" style={{ height }}>
       <MapContainer
         center={SENEGAL_CENTER}
         zoom={SENEGAL_ZOOM}
