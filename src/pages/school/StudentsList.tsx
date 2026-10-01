@@ -35,7 +35,7 @@ export default function StudentsListPage() {
           <input value={form.className} onChange={(e) => setForm({ ...form, className: e.target.value })} placeholder="Classe" className="px-3 py-2 border border-slate-200 rounded-lg" />
           <input value={form.parentName} onChange={(e) => setForm({ ...form, parentName: e.target.value })} placeholder="Nom du parent" className="px-3 py-2 border border-slate-200 rounded-lg" />
           <input value={form.parentPhone} onChange={(e) => setForm({ ...form, parentPhone: e.target.value })} placeholder="Téléphone parent" className="px-3 py-2 border border-slate-200 rounded-lg" />
-          <input value={form.imei} onChange={(e) => setForm({ ...form, imei: e.target.value })} placeholder="IMEI traceur (tracking phase 2)" className="px-3 py-2 border border-slate-200 rounded-lg" />
+          <input value={form.imei} onChange={(e) => setForm({ ...form, imei: e.target.value })} placeholder="IMEI du traceur (15 chiffres)" className="px-3 py-2 border border-slate-200 rounded-lg" />
           <button type="submit" disabled={createStudent.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold col-span-2 disabled:opacity-50">Ajouter</button>
         </form>
       )}
