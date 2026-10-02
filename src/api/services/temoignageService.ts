@@ -40,16 +40,16 @@ export interface CreateTemoignageDto {
 export const temoignageService = {
   create: async (data: CreateTemoignageDto): Promise<Temoignage> => {
     const response = await apiClient.post('/temoignage', data)
-    return (response as any).data as Temoignage
+    return response as unknown as Temoignage
   },
 
   getBySignalement: async (signalementId: string): Promise<Temoignage[]> => {
     const response = await apiClient.get(`/temoignage/signalement/${signalementId}`)
-    return (response as any).data as Temoignage[]
+    return response as unknown as Temoignage[]
   },
 
   verify: async (id: string): Promise<Temoignage> => {
     const response = await apiClient.patch(`/temoignage/${id}/verify`, {})
-    return (response as any).data as Temoignage
+    return response as unknown as Temoignage
   },
 }
