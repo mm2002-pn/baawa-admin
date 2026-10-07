@@ -65,6 +65,7 @@ export function useRealtimeNotifications() {
         // Alarme d'un traceur élève (SOS, chute…) : toast rouge qui reste affiché
         toast.error(title, 30_000)
         queryClient.invalidateQueries({ queryKey: ['student-positions'] })
+        queryClient.invalidateQueries({ queryKey: ['alarms'] })
         showDesktopNotification(title, message, true)
         return
       }

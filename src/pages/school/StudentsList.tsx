@@ -1,60 +1,143 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AdminLayout } from '../../components/layout/AdminLayout'
-import { useStudents, useCreateStudent, useDeleteStudent } from '../../hooks/useStudents'
+import { StudentFormDialog } from '../../components/students/StudentFormDialog'
+import { TrackingPill } from '../../components/trackers/TrackerBits'
+import {
+  Avatar, Btn, ConfirmDialog, EmptyState, IconBtn, Loading, PageContainer, Panel, Pill, SearchInput, Segmented,
+} from '../../components/ui/kit'
+import { useStudents, useDeleteStudent } from '../../hooks/useStudents'
+import { useStudentPositions } from '../../hooks/useStudentPositions'
+import { useMySchoolTrackers } from '../../hooks/useTrackers'
+import { Student } from '../../api/types'
+import { trackerName } from '../../utils/tracking'
 
-const EMPTY = { firstName: '', lastName: '', className: '', parentName: '', parentPhone: '', imei: '' }
+type EquipFilter = 'all' | 'equipped' | 'unequipped'
 
 export default function StudentsListPage() {
   const [search, setSearch] = useState('')
-  const { data: students, isLoading } = useStudents(search || undefined)
-  const createStudent = useCreateStudent()
+  const [filter, setFilter] = useState<EquipFilter>('all')
+  const { data: students, isLoading } = useStudents(search.trim() || undefined)
+  const { data: trackers } = useMySchoolTrackers()
+  const { data: positions } = useStudentPositions()
   const deleteStudent = useDeleteStudent()
-  const [form, setForm] = useState(EMPTY)
-  const [showForm, setShowForm] = useState(false)
 
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault()
-    createStudent.mutate(
-      { firstName: form.firstName, lastName: form.lastName, className: form.className || undefined,
-        parentName: form.parentName || undefined, parentPhone: form.parentPhone || undefined, imei: form.imei || undefined },
-      { onSuccess: () => { setShowForm(false); setForm(EMPTY) } },
-    )
-  }
+  // `undefined` : fermé ; `null` : création ; sinon l'élève en cours de modification
+  const [editing, setEditing] = useState<Student | null | undefined>(undefined)
+  const [deleting, setDeleting] = useState<Student | null>(null)
+
+  const liveByStudent = useMemo(() => new Map((positions ?? []).map((p) => [p.studentId, p])), [positions])
+  const all = students ?? []
+  const equipped = all.filter((s) => s.tracker).length
+  const shown = all.filter((s) => filter === 'all' || (filter === 'equipped') === !!s.tracker)
 
   return (
     <AdminLayout title="Élèves">
-      <div className="flex items-center justify-between mb-6">
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher un élève..." className="px-4 py-2 border border-slate-200 rounded-lg w-72" />
-        <button onClick={() => setShowForm((v) => !v)} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">+ Ajouter un élève</button>
-      </div>
-
-      {showForm && (
-        <form onSubmit={submit} className="bg-white border border-slate-100 rounded-xl p-4 mb-6 grid grid-cols-2 gap-3">
-          <input required value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} placeholder="Prénom *" className="px-3 py-2 border border-slate-200 rounded-lg" />
-          <input required value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} placeholder="Nom *" className="px-3 py-2 border border-slate-200 rounded-lg" />
-          <input value={form.className} onChange={(e) => setForm({ ...form, className: e.target.value })} placeholder="Classe" className="px-3 py-2 border border-slate-200 rounded-lg" />
-          <input value={form.parentName} onChange={(e) => setForm({ ...form, parentName: e.target.value })} placeholder="Nom du parent" className="px-3 py-2 border border-slate-200 rounded-lg" />
-          <input value={form.parentPhone} onChange={(e) => setForm({ ...form, parentPhone: e.target.value })} placeholder="Téléphone parent" className="px-3 py-2 border border-slate-200 rounded-lg" />
-          <input value={form.imei} onChange={(e) => setForm({ ...form, imei: e.target.value })} placeholder="IMEI du traceur (15 chiffres)" className="px-3 py-2 border border-slate-200 rounded-lg" />
-          <button type="submit" disabled={createStudent.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold col-span-2 disabled:opacity-50">Ajouter</button>
-        </form>
-      )}
-
-      {isLoading ? (
-        <p className="text-slate-400">Chargement…</p>
-      ) : (
-        <div className="bg-white border border-slate-100 rounded-xl divide-y">
-          {students?.length ? students.map((st) => (
-            <div key={st.id} className="flex items-center justify-between px-4 py-3">
-              <div>
-                <p className="font-bold text-slate-900">{st.firstName} {st.lastName}</p>
-                <p className="text-sm text-slate-500">{st.className || '—'} · {st.parentName || 'parent —'}</p>
-              </div>
-              <button onClick={() => deleteStudent.mutate(st.id)} className="text-red-600 text-sm font-semibold hover:underline">Supprimer</button>
-            </div>
-          )) : <p className="px-4 py-8 text-center text-slate-400">Aucun élève</p>}
+      <PageContainer>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <SearchInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher un élève, une classe, un parent…" />
+          <Btn icon="person_add" onClick={() => setEditing(null)}>Ajouter un élève</Btn>
         </div>
+
+        <Segmented
+          value={filter}
+          onChange={setFilter}
+          options={[
+            { value: 'all', label: 'Tous', count: all.length },
+            { value: 'equipped', label: 'Avec boîtier', count: equipped },
+            { value: 'unequipped', label: 'Sans boîtier', count: all.length - equipped },
+          ]}
+        />
+
+        {isLoading ? (
+          <Loading />
+        ) : shown.length === 0 ? (
+          <Panel>
+            {all.length === 0 && !search ? (
+              <EmptyState
+                icon="groups"
+                title="Aucun élève pour le moment"
+                text="Ajoutez vos élèves, puis attribuez-leur un boîtier GPS pour les suivre sur la carte."
+                action={<Btn icon="person_add" onClick={() => setEditing(null)}>Ajouter un élève</Btn>}
+              />
+            ) : (
+              <EmptyState icon="search_off" title="Aucun élève ne correspond" text="Modifiez votre recherche ou changez de filtre." />
+            )}
+          </Panel>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {shown.map((st) => {
+              const live = liveByStudent.get(st.id)
+              const parent = [st.parentName, st.parentPhone].filter(Boolean).join(' · ')
+              return (
+                <div
+                  key={st.id}
+                  className="flex flex-wrap items-center gap-3 bg-white border border-[#e8ecf2] rounded-2xl px-4 py-3"
+                >
+                  <Avatar name={`${st.firstName} ${st.lastName}`} size={46} />
+                  <div className="flex-1 min-w-[180px]">
+                    <p className="font-extrabold text-[15px] text-[#101828] truncate">
+                      {st.firstName} {st.lastName}
+                    </p>
+                    <p className="text-[13px] font-semibold text-[#98a2b3] truncate">
+                      {st.className || 'Classe non renseignée'}
+                      {parent && ` · ${parent}`}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {st.tracker ? (
+                      <>
+                        <Pill tone="blue" icon="gps_fixed" title={`IMEI ${st.tracker.imei}`}>{trackerName(st.tracker)}</Pill>
+                        {live && <TrackingPill live={live} />}
+                      </>
+                    ) : (
+                      <Pill tone="slate" icon="gps_off">Sans boîtier</Pill>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    {st.tracker && (
+                      <Link
+                        to={`/map?student=${st.id}`}
+                        title="Voir sur la carte"
+                        aria-label="Voir sur la carte"
+                        className="flex items-center justify-center w-9 h-9 rounded-[10px] text-[#667085] transition hover:bg-[#eef4ff] hover:text-[#2563eb]"
+                      >
+                        <span className="material-symbols-outlined text-[19px]">map</span>
+                      </Link>
+                    )}
+                    <IconBtn icon="edit" label="Modifier" tone="blue" onClick={() => setEditing(st)} />
+                    <IconBtn icon="delete" label="Supprimer" tone="red" onClick={() => setDeleting(st)} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </PageContainer>
+
+      {editing !== undefined && (
+        <StudentFormDialog student={editing} trackers={trackers ?? []} onClose={() => setEditing(undefined)} />
       )}
+
+      <ConfirmDialog
+        open={!!deleting}
+        onClose={() => setDeleting(null)}
+        onConfirm={() => deleting && deleteStudent.mutate(deleting.id, { onSuccess: () => setDeleting(null) })}
+        loading={deleteStudent.isPending}
+        danger
+        title="Supprimer cet élève ?"
+        confirmLabel="Supprimer"
+        message={
+          <>
+            <strong className="text-[#101828]">{deleting?.firstName} {deleting?.lastName}</strong> sera retiré de la liste.
+            {deleting?.tracker && (
+              <> Son boîtier ({trackerName(deleting.tracker)}) redeviendra libre et pourra être attribué à un autre élève.</>
+            )}
+          </>
+        }
+      />
     </AdminLayout>
   )
 }

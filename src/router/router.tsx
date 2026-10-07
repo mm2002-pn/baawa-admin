@@ -25,6 +25,11 @@ const StudentsPage = lazy(() => import('../pages/school/StudentsList'))
 const MySchoolPage = lazy(() => import('../pages/school/MySchool'))
 const SchoolUsersPage = lazy(() => import('../pages/school/SchoolUsers'))
 const MapViewPage = lazy(() => import('../pages/school/MapView'))
+const SchoolTrackersPage = lazy(() => import('../pages/school/TrackersList'))
+const SchoolAlertsPage = lazy(() => import('../pages/school/Alerts'))
+const FleetPage = lazy(() => import('../pages/fleet/FleetList'))
+const FleetMapPage = lazy(() => import('../pages/fleet/FleetMap'))
+const PlansPage = lazy(() => import('../pages/fleet/PlansList'))
 const NotificationsSettingsPage = lazy(() => import('../pages/settings/NotificationsSettings'))
 
 const LoadingFallback = () => (
@@ -209,6 +214,46 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
         <Suspense fallback={<LoadingFallback />}><MapViewPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/trackers',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
+        <Suspense fallback={<LoadingFallback />}><SchoolTrackersPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/alerts',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_SCHOOL]}>
+        <Suspense fallback={<LoadingFallback />}><SchoolAlertsPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/fleet',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
+        <Suspense fallback={<LoadingFallback />}><FleetPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/plans',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
+        <Suspense fallback={<LoadingFallback />}><PlansPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/fleet/map',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
+        <Suspense fallback={<LoadingFallback />}><FleetMapPage /></Suspense>
       </ProtectedRoute>
     ),
   },
