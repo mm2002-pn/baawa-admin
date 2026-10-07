@@ -1,81 +1,75 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import { useNavigate, useParams } from 'react-router-dom'
 import { AdminLayout } from '../../components/layout/AdminLayout'
-import { useSchool, useCreateSchoolAdmin, useSchoolStudents } from '../../hooks/useSchools'
-
-function initialsOf(name: string) {
-  const words = name.trim().split(/\s+/).filter(Boolean)
-  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase()
-  return name.slice(0, 2).toUpperCase()
-}
-
-const inputBase =
-  'border border-[#e2e7ee] rounded-xl px-[14px] py-[13px] text-sm text-[#101828] outline-none transition focus:border-[#2563eb] focus:ring-4 focus:ring-[#2563eb]/[.12]'
-
-const cardBase = 'bg-white border border-[#e8ecf2] rounded-[20px]'
+import { SchoolAccounts } from '../../components/schools/SchoolAccounts'
+import { SchoolFormDialog } from '../../components/schools/SchoolFormDialog'
+import { SchoolTrackersPanel } from '../../components/trackers/SchoolTrackersPanel'
+import {
+  Avatar, Btn, ConfirmDialog, EmptyState, Loading, PageContainer, Panel, PanelHeader, Pill,
+} from '../../components/ui/kit'
+import {
+  useSchool, useCreateSchoolAdmin, useSchoolStudents, useSchoolUsers, useToggleSchoolUser,
+  useToggleSchool, useDeleteSchool,
+} from '../../hooks/useSchools'
+import { initialsOf, longDate, trackerName } from '../../utils/tracking'
 
 export default function SchoolDetailsPage() {
   const { id = '' } = useParams()
+  const navigate = useNavigate()
   const { data: school, isLoading } = useSchool(id)
   const { data: students } = useSchoolStudents(id)
+  const { data: users, isLoading: usersLoading } = useSchoolUsers(id)
   const createAdmin = useCreateSchoolAdmin(id)
-  const [form, setForm] = useState({ email: '', firstName: '', lastName: '', phoneNumber: '' })
-  const [created, setCreated] = useState<{ email: string; tempPassword: string } | null>(null)
-  const [copied, setCopied] = useState(false)
+  const toggleUser = useToggleSchoolUser(id)
+  const toggleSchool = useToggleSchool(id)
+  const deleteSchool = useDeleteSchool()
+  const [editing, setEditing] = useState(false)
+  const [confirm, setConfirm] = useState<'toggle' | 'delete' | null>(null)
 
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault()
-    createAdmin.mutate(form, {
-      onSuccess: (data: any) => {
-        setForm({ email: '', firstName: '', lastName: '', phoneNumber: '' })
-        setCopied(false)
-        if (data?.tempPassword) setCreated({ email: data.email, tempPassword: data.tempPassword })
-      },
-    })
+  if (isLoading) return <AdminLayout title="École" backTo="/schools"><Loading /></AdminLayout>
+  if (!school) {
+    return (
+      <AdminLayout title="École" backTo="/schools">
+        <PageContainer><Panel><EmptyState icon="school" title="École introuvable" text="Elle a peut-être été supprimée." /></Panel></PageContainer>
+      </AdminLayout>
+    )
   }
-
-  const copyPassword = () => {
-    if (!created) return
-    navigator.clipboard?.writeText(created.tempPassword)
-    setCopied(true)
-  }
-
-  if (isLoading) return <AdminLayout title="École" backTo="/schools"><p className="text-[#98a2b3]">Chargement…</p></AdminLayout>
 
   const chips = [
-    { icon: 'location_on', value: school?.region },
-    { icon: 'phone', value: school?.phoneNumber },
-    { icon: 'mail', value: school?.email },
-    { icon: 'home', value: school?.address },
-    { icon: 'calendar_today', value: school?.createdAt ? `Depuis le ${format(new Date(school.createdAt), 'd MMMM yyyy', { locale: fr })}` : undefined },
-  ]
+    { icon: 'location_on', value: school.region },
+    { icon: 'phone', value: school.phoneNumber },
+    { icon: 'mail', value: school.email },
+    { icon: 'home', value: school.address },
+    { icon: 'calendar_today', value: `Depuis le ${longDate(school.createdAt)}` },
+  ].filter((c) => c.value)
+  const trackerCount = school._count?.trackers ?? 0
 
   return (
-    <AdminLayout title={school?.name || 'École'} backTo="/schools">
-      <div className="mx-auto max-w-[1080px] flex flex-col gap-[22px]">
-        <div className={`${cardBase} relative overflow-hidden p-7 shadow-[0_8px_26px_-18px_rgba(16,24,40,.28)]`}>
+    <AdminLayout title={school.name} backTo="/schools">
+      <PageContainer>
+        <Panel className="relative overflow-hidden p-7">
           <div
             className="pointer-events-none absolute inset-0"
             style={{ background: 'radial-gradient(120% 140% at 100% 0%, rgba(37,99,235,.07), transparent 55%)' }}
           />
           <div className="relative z-10">
-            <div className="flex items-center justify-center w-[66px] h-[66px] rounded-[18px] bg-gradient-to-br from-[#2563eb] to-[#1e40af] text-white font-extrabold text-[22px] shadow-[0_12px_24px_-10px_rgba(37,99,235,.6)]">
-              {school?.name ? initialsOf(school.name) : '—'}
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="flex items-center justify-center w-[66px] h-[66px] rounded-[18px] bg-gradient-to-br from-[#2563eb] to-[#1e40af] text-white font-extrabold text-[22px] shadow-[0_12px_24px_-10px_rgba(37,99,235,.6)]">
+                {initialsOf(school.name)}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Btn size="sm" variant="secondary" icon="edit" onClick={() => setEditing(true)}>Modifier</Btn>
+                <Btn size="sm" variant="secondary" icon={school.isActive ? 'block' : 'check_circle'} onClick={() => setConfirm('toggle')}>
+                  {school.isActive ? 'Désactiver' : 'Réactiver'}
+                </Btn>
+                <Btn size="sm" variant="secondary" icon="delete" className="hover:bg-[#fef3f2] hover:text-[#d92d20]" onClick={() => setConfirm('delete')}>
+                  Supprimer
+                </Btn>
+              </div>
             </div>
-            <div className="flex items-center gap-3 mt-4">
-              <h2 className="text-2xl font-extrabold tracking-[-0.02em] text-[#101828]">{school?.name}</h2>
-              {school && (
-                <span
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                    school.isActive ? 'bg-[#ecfdf3] text-[#067647]' : 'bg-[#f5f6f8] text-[#667085]'
-                  }`}
-                >
-                  <span className={`h-1.5 w-1.5 rounded-full ${school.isActive ? 'bg-[#12b76a]' : 'bg-[#98a2b3]'}`} />
-                  {school.isActive ? 'Active' : 'Inactive'}
-                </span>
-              )}
+            <div className="flex flex-wrap items-center gap-3 mt-4">
+              <h2 className="text-2xl font-extrabold tracking-[-0.02em] text-[#101828]">{school.name}</h2>
+              <Pill tone={school.isActive ? 'green' : 'slate'} dot>{school.isActive ? 'Active' : 'Inactive'}</Pill>
             </div>
             <div className="flex flex-wrap gap-[10px] mt-4">
               {chips.map((chip) => (
@@ -84,120 +78,89 @@ export default function SchoolDetailsPage() {
                   className="flex items-center gap-2 px-[14px] py-2 rounded-[11px] bg-[#f7f9fc] border border-[#eef1f5] text-[#475467] font-semibold text-[13.5px]"
                 >
                   <span className="material-symbols-outlined text-[16px] text-[#2563eb]">{chip.icon}</span>
-                  {chip.value || '—'}
+                  {chip.value}
                 </span>
               ))}
             </div>
           </div>
-        </div>
+        </Panel>
 
-        <div className={`${cardBase} p-7 shadow-[0_8px_26px_-18px_rgba(16,24,40,.28)]`}>
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex items-center justify-center w-[38px] h-[38px] rounded-[11px] bg-[#eef4ff] text-[#2563eb]">
-              <span className="material-symbols-outlined text-[20px]">person_add</span>
-            </div>
-            <div>
-              <h3 className="text-[17px] font-extrabold text-[#101828]">Créer le compte administrateur de l'école</h3>
-              <p className="text-[13px] font-semibold text-[#98a2b3]">Un mot de passe temporaire sera généré automatiquement.</p>
-            </div>
-          </div>
+        <SchoolAccounts
+          users={users}
+          isLoading={usersLoading}
+          onCreate={(data) => createAdmin.mutateAsync(data)}
+          creating={createAdmin.isPending}
+          onToggle={(userId) => toggleUser.mutateAsync(userId)}
+          toggling={toggleUser.isPending}
+        />
 
-          <form onSubmit={submit} className="grid grid-cols-2 gap-4">
-            <label className="flex flex-col gap-[7px]">
-              <span className="text-[12.5px] font-bold text-[#475467]">Prénom *</span>
-              <input required value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} placeholder="Ex. Fatou" className={inputBase} />
-            </label>
-            <label className="flex flex-col gap-[7px]">
-              <span className="text-[12.5px] font-bold text-[#475467]">Nom *</span>
-              <input required value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} placeholder="Ex. DIALLO" className={inputBase} />
-            </label>
-            <label className="flex flex-col gap-[7px]">
-              <span className="text-[12.5px] font-bold text-[#475467]">Email *</span>
-              <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="admin@ecole.sn" className={inputBase} />
-            </label>
-            <label className="flex flex-col gap-[7px]">
-              <span className="text-[12.5px] font-bold text-[#475467]">Téléphone *</span>
-              <input required value={form.phoneNumber} onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })} placeholder="77 000 00 00" className={inputBase} />
-            </label>
-            <button
-              type="submit"
-              disabled={createAdmin.isPending}
-              className="col-span-2 py-[14px] rounded-[13px] bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] text-white font-bold text-[15px] shadow-[0_10px_22px_-10px_rgba(37,99,235,.7)] disabled:opacity-50"
-            >
-              Créer le compte
-            </button>
-          </form>
+        <SchoolTrackersPanel schoolId={school.id} schoolName={school.name} />
 
-          {created && (
-            <div className="mt-5 rounded-2xl border border-[#fed7aa] bg-gradient-to-b from-[#fffbf5] to-[#fff7ed] p-5">
-              <p className="flex items-center gap-2 font-extrabold text-[#9a3412]">
-                <span className="material-symbols-outlined text-[#c2410c] text-[18px]">warning</span>
-                Compte créé — notez ces identifiants
-              </p>
-              <p className="text-[12.5px] font-semibold text-[#b45309] mt-2">
-                Ce mot de passe temporaire ne sera plus affiché. Communiquez-le à l'utilisateur ; il devra le changer à sa première connexion.
-              </p>
-              <div className="flex flex-col gap-2 mt-3">
-                <div className="flex items-center justify-between bg-white border border-[#fed7aa] rounded-[10px] px-3 py-2 text-sm">
-                  <span className="text-[#b45309]">Identifiant</span>
-                  <code className="font-mono text-[#101828]">{created.email}</code>
-                </div>
-                <div className="flex items-center justify-between bg-white border border-[#fed7aa] rounded-[10px] px-3 py-2 text-sm">
-                  <span className="text-[#b45309]">Mot de passe temporaire</span>
-                  <code className="font-mono font-bold text-[#101828]">{created.tempPassword}</code>
-                </div>
-              </div>
-              <button
-                onClick={copyPassword}
-                className="mt-3 px-4 py-2 rounded-lg bg-[#ea580c] text-white text-xs font-bold"
-              >
-                {copied ? 'Copié ✓' : 'Copier le mot de passe'}
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className={`${cardBase} p-7 shadow-[0_8px_26px_-18px_rgba(16,24,40,.28)]`}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[17px] font-extrabold text-[#101828]">Élèves</h3>
-            <span className="px-3 py-1 rounded-full bg-[#eef4ff] text-[#2563eb] font-extrabold text-sm">
-              {students?.length ?? 0}
-            </span>
-          </div>
+        <Panel className="p-7">
+          <PanelHeader
+            icon="groups"
+            title="Élèves"
+            subtitle="Gérés par l'école — consultation seule"
+            action={<span className="px-3 py-1 rounded-full bg-[#eef4ff] text-[#2563eb] font-extrabold text-sm">{students?.length ?? 0}</span>}
+          />
           {students?.length ? (
             <div className="flex flex-col gap-2">
               {students.map((st) => (
-                <div key={st.id} className="flex items-center gap-3 bg-[#f9fafc] border border-[#eef1f5] rounded-[13px] px-[14px] py-3">
-                  <div className="flex items-center justify-center w-[42px] h-[42px] rounded-xl bg-[#e6edfb] text-[#1e40af] font-extrabold text-sm shrink-0">
-                    {(st.firstName[0] ?? '') + (st.lastName[0] ?? '')}
-                  </div>
-                  <div className="flex-1 min-w-0">
+                <div key={st.id} className="flex flex-wrap items-center gap-3 bg-[#f9fafc] border border-[#eef1f5] rounded-[13px] px-[14px] py-3">
+                  <Avatar name={`${st.firstName} ${st.lastName}`} />
+                  <div className="flex-1 min-w-[160px]">
                     <p className="font-bold text-[14.5px] text-[#101828] truncate">{st.firstName} {st.lastName}</p>
                     <p className="text-[12.5px] text-[#98a2b3] truncate">
-                      {st.parentName || st.parentPhone
-                        ? [st.parentName, st.parentPhone].filter(Boolean).join(' · ')
-                        : 'Élève'}
+                      {[st.parentName, st.parentPhone].filter(Boolean).join(' · ') || 'Parent non renseigné'}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {st.imei && (
-                      <span className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#f2f6ff] text-[#2563eb] font-bold text-xs" title={`IMEI ${st.imei}`}>
-                        <span className="material-symbols-outlined text-[14px]">gps_fixed</span>
-                        {st.imei}
-                      </span>
-                    )}
-                    <span className="px-[13px] py-1.5 rounded-full bg-[#f1f2f4] text-[#475467] font-bold text-sm">
-                      {st.className || '—'}
-                    </span>
-                  </div>
+                  {st.tracker && (
+                    <Pill tone="blue" icon="gps_fixed" title={`IMEI ${st.tracker.imei}`}>{trackerName(st.tracker)}</Pill>
+                  )}
+                  <Pill tone="slate">{st.className || 'Classe —'}</Pill>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-center text-[#98a2b3] font-semibold py-8">Aucun élève inscrit pour le moment.</p>
+            <EmptyState icon="groups" title="Aucun élève inscrit pour le moment" />
           )}
-        </div>
-      </div>
+        </Panel>
+      </PageContainer>
+
+      {editing && <SchoolFormDialog school={school} onClose={() => setEditing(false)} />}
+
+      <ConfirmDialog
+        open={confirm === 'toggle'}
+        onClose={() => setConfirm(null)}
+        onConfirm={() => toggleSchool.mutate(undefined, { onSuccess: () => setConfirm(null) })}
+        loading={toggleSchool.isPending}
+        danger={school.isActive}
+        title={school.isActive ? 'Désactiver cette école ?' : 'Réactiver cette école ?'}
+        confirmLabel={school.isActive ? 'Désactiver' : 'Réactiver'}
+        message={
+          school.isActive
+            ? <>L'école <strong className="text-[#101828]">{school.name}</strong> sera marquée inactive. Ses données et ses boîtiers sont conservés.</>
+            : <>L'école <strong className="text-[#101828]">{school.name}</strong> sera de nouveau active.</>
+        }
+      />
+
+      <ConfirmDialog
+        open={confirm === 'delete'}
+        onClose={() => setConfirm(null)}
+        onConfirm={() => deleteSchool.mutate(school.id, { onSuccess: () => navigate('/schools') })}
+        loading={deleteSchool.isPending}
+        danger
+        title="Supprimer cette école ?"
+        confirmLabel="Supprimer l'école"
+        message={
+          <>
+            <strong className="text-[#101828]">{school.name}</strong> disparaîtra de la liste.
+            {trackerCount > 0 && (
+              <> Ses {trackerCount} boîtier{trackerCount > 1 ? 's' : ''} retourneront en stock et ses élèves ne seront plus suivis.</>
+            )}
+          </>
+        }
+      />
     </AdminLayout>
   )
 }

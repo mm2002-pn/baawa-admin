@@ -1,5 +1,5 @@
 import { apiClient } from '../client'
-import { School, Student, CreateSchoolDto, CreateSchoolUserDto } from '../types'
+import { School, SchoolUser, Student, CreateSchoolDto, CreateSchoolUserDto } from '../types'
 
 export const schoolsService = {
   getAll: async (page = 1, limit = 10, search?: string): Promise<{ data: School[]; total: number }> => {
@@ -29,6 +29,14 @@ export const schoolsService = {
   },
   createAdmin: async (id: string, data: CreateSchoolUserDto) => {
     const res = await apiClient.post(`/schools/${id}/users`, data)
+    return (res as any).data
+  },
+  getUsers: async (id: string): Promise<SchoolUser[]> => {
+    const res = await apiClient.get(`/schools/${id}/users`)
+    return (res as any).data
+  },
+  toggleUser: async (id: string, userId: string): Promise<SchoolUser> => {
+    const res = await apiClient.patch(`/schools/${id}/users/${userId}/toggle-active`, {})
     return (res as any).data
   },
   getStudents: async (id: string): Promise<Student[]> => {

@@ -26,7 +26,7 @@ export function ProtectedRoute({ children, allowedRoles = PANEL_ROLES }: Protect
 
   if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
     // Rediriger un école vers ses élèves, sinon vers l'accueil
-    const fallback = user.role === Role.ADMIN_SCHOOL ? '/students' : '/'
+    const fallback = user.role === Role.ADMIN_SCHOOL ? '/my-school' : '/'
     return <Navigate to={fallback} replace />
   }
 

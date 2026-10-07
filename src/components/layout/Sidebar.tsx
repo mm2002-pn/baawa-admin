@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { authService } from '../../api/services/authService'
 import { Role } from '../../api/types'
+import { useOpenAlarmsCount } from '../../hooks/useTrackers'
 import logoBaawa from '../../assets/baawa.jpg'
 
 interface NavItem {
@@ -19,9 +20,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { label: 'Signalements', href: '/signalements', icon: 'person_search', roles: [Role.ADMIN_BAAWA, Role.POLICIER] },
   { label: 'Témoignages', href: '/tips', icon: 'record_voice_over', roles: [Role.ADMIN_BAAWA, Role.POLICIER] },
   { label: 'Écoles', href: '/schools', icon: 'school', roles: [Role.ADMIN_BAAWA] },
+  { label: 'Boîtiers GPS', href: '/fleet', icon: 'gps_fixed', roles: [Role.ADMIN_BAAWA] },
+  { label: 'Formules', href: '/plans', icon: 'sell', roles: [Role.ADMIN_BAAWA] },
   { label: 'Mon école', href: '/my-school', icon: 'school', roles: [Role.ADMIN_SCHOOL] },
-  { label: 'Élèves', href: '/students', icon: 'groups', roles: [Role.ADMIN_SCHOOL] },
   { label: 'Carte', href: '/map', icon: 'map', roles: [Role.ADMIN_SCHOOL] },
+  { label: 'Alertes', href: '/alerts', icon: 'notification_important', roles: [Role.ADMIN_SCHOOL] },
+  { label: 'Élèves', href: '/students', icon: 'groups', roles: [Role.ADMIN_SCHOOL] },
+  { label: 'Boîtiers GPS', href: '/trackers', icon: 'gps_fixed', roles: [Role.ADMIN_SCHOOL] },
   { label: 'Utilisateurs', href: '/school-users', icon: 'people', roles: [Role.ADMIN_SCHOOL] },
   { label: 'Paramètres', href: '/settings', icon: 'settings', roles: [Role.ADMIN_BAAWA] },
 ]
@@ -38,6 +43,9 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   const navItems = ALL_NAV_ITEMS.filter(
     (item) => !user?.role || item.roles.includes(user.role as Role),
   )
+  // Les alarmes des boîtiers ne concernent que les comptes d'école
+  const { data: alarms } = useOpenAlarmsCount(user?.role === Role.ADMIN_SCHOOL)
+  const openAlarms = alarms?.open ?? 0
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -103,7 +111,17 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
               }`}
             >
               <span className="material-symbols-outlined text-xl">{item.icon}</span>
-              <span className="text-sm">{item.label}</span>
+              <span className="text-sm flex-1">{item.label}</span>
+              {item.href === '/alerts' && openAlarms > 0 && (
+                <span
+                  className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold ${
+                    isActive(item.href) ? 'bg-white text-blue-600' : 'bg-red-500 text-white'
+                  }`}
+                  aria-label={`${openAlarms} alerte(s) à traiter`}
+                >
+                  {openAlarms > 99 ? '99+' : openAlarms}
+                </span>
+              )}
             </Link>
           ))}
         </nav>

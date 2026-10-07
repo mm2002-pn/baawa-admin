@@ -28,7 +28,7 @@ export default function ChangePasswordPage() {
       await authService.changePassword(password)
       if (user) setUser({ ...user, mustChangePassword: false })
       toast.success('Mot de passe mis à jour')
-      const landing = user?.role === Role.ADMIN_SCHOOL ? '/students' : '/'
+      const landing = user?.role === Role.ADMIN_SCHOOL ? '/my-school' : '/'
       navigate(landing, { replace: true })
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Erreur lors du changement de mot de passe')

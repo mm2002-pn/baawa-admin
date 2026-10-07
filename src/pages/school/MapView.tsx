@@ -1,109 +1,213 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import { Icon } from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import { useMemo, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { AdminLayout } from '../../components/layout/AdminLayout'
-import { useStudentPositions } from '../../hooks/useStudentPositions'
-import type { TraccarPosition, TrackerStatus } from '../../api/types'
+import { TrackingMap } from '../../components/map/TrackingMap'
+import { Battery, TrackingPill } from '../../components/trackers/TrackerBits'
+import { Avatar, Btn, EmptyState, ErrorNote, IconBtn, Loading, Panel, Segmented } from '../../components/ui/kit'
+import { useStudentPositions, useStudentRoute } from '../../hooks/useStudentPositions'
+import { StudentPositionEntry, TraccarPosition } from '../../api/types'
+import { cn } from '../../utils/cn'
+import { shortDateTime, timeAgo, trackerName, trackingSummary } from '../../utils/tracking'
 
-// Fix for default marker icons in React-Leaflet (bundlers break Leaflet's icon resolution)
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
-import markerIcon from 'leaflet/dist/images/marker-icon.png'
-import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+type RouteRange = 'none' | '1' | '6' | '24'
 
-// @ts-ignore
-delete (Icon.Default.prototype as any)._getIconUrl
-Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-})
-
-const SENEGAL_CENTER: [number, number] = [14.7167, -17.4677]
-
-const STATUS_STYLES: Record<TrackerStatus, { label: string; className: string }> = {
-  online: { label: 'En ligne', className: 'bg-green-100 text-green-700' },
-  offline: { label: 'Hors ligne', className: 'bg-red-100 text-red-700' },
-  unknown: { label: 'Jamais connecté', className: 'bg-slate-100 text-slate-500' },
+/** Distance parcourue le long du trajet, en kilomètres (formule de haversine). */
+function routeDistanceKm(route: TraccarPosition[]) {
+  const rad = (deg: number) => (deg * Math.PI) / 180
+  let total = 0
+  for (let i = 1; i < route.length; i++) {
+    const a = route[i - 1]
+    const b = route[i]
+    const dLat = rad(b.latitude - a.latitude)
+    const dLon = rad(b.longitude - a.longitude)
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.latitude)) * Math.cos(rad(b.latitude)) * Math.sin(dLon / 2) ** 2
+    total += 2 * 6371 * Math.asin(Math.sqrt(h))
+  }
+  return total
 }
 
-function StatusBadge({ status }: { status: TrackerStatus }) {
-  const s = STATUS_STYLES[status] ?? STATUS_STYLES.unknown
-  return <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${s.className}`}>{s.label}</span>
-}
+// Les élèves qui demandent de l'attention remontent en tête de liste
+const TONE_ORDER = { red: 0, amber: 1, slate: 2, green: 3 }
 
-function batteryText(position: TraccarPosition | null): string {
-  if (!position || position.batteryLevel == null) return '—'
-  return `${position.batteryLevel} %${position.charging ? ' (en charge)' : ''}`
-}
+function StudentDetails({ entry, range, onRange, onClose }: {
+  entry: StudentPositionEntry
+  range: RouteRange
+  onRange: (range: RouteRange) => void
+  onClose: () => void
+}) {
+  const hours = range === 'none' ? null : Number(range)
+  const { data: route, isFetching } = useStudentRoute(entry.studentId, hours)
+  const summary = trackingSummary(entry)
+  const { position } = entry
 
-function batteryClass(position: TraccarPosition | null): string {
-  if (!position || position.batteryLevel == null) return 'text-slate-400'
-  if (position.batteryLevel <= 20) return 'text-red-600 font-semibold'
-  if (position.batteryLevel <= 40) return 'text-amber-600'
-  return 'text-slate-700'
+  return (
+    <div className="flex flex-col gap-4 p-5">
+      <div className="flex items-start gap-3">
+        <Avatar name={`${entry.firstName} ${entry.lastName}`} size={46} />
+        <div className="flex-1 min-w-0">
+          <p className="font-extrabold text-[16px] text-[#101828] truncate">{entry.firstName} {entry.lastName}</p>
+          <p className="text-[13px] font-semibold text-[#98a2b3] truncate">
+            {entry.className || 'Classe non renseignée'}
+            {entry.tracker && ` · ${trackerName(entry.tracker)}`}
+          </p>
+        </div>
+        <IconBtn icon="close" label="Revenir à la liste" onClick={onClose} className="-mr-2 -mt-1" />
+      </div>
+
+      <div className="rounded-xl border border-[#eef1f5] bg-[#f9fafc] p-4">
+        <div className="flex items-center justify-between gap-2">
+          <TrackingPill live={entry} />
+          <Battery position={position} />
+        </div>
+        <p className="text-[13px] text-[#475467] mt-3">{summary.detail}</p>
+        <dl className="grid grid-cols-2 gap-x-3 gap-y-2 mt-3 text-[12.5px]">
+          <dt className="text-[#98a2b3]">Dernier signal</dt>
+          <dd className="text-right font-semibold text-[#101828]">{entry.lastUpdate ? timeAgo(entry.lastUpdate) : 'Jamais'}</dd>
+          {position && (
+            <>
+              <dt className="text-[#98a2b3]">Point GPS</dt>
+              <dd className="text-right font-semibold text-[#101828]">{shortDateTime(position.fixTime)}</dd>
+              <dt className="text-[#98a2b3]">Vitesse</dt>
+              <dd className="text-right font-semibold text-[#101828]">{position.speedKmh > 0 ? `${position.speedKmh} km/h` : 'À l’arrêt'}</dd>
+            </>
+          )}
+        </dl>
+        {position && (
+          <a
+            href={`https://maps.google.com/?q=${position.latitude},${position.longitude}`}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-[12.5px] font-bold text-[#2563eb] mt-3 hover:underline"
+          >
+            <span className="material-symbols-outlined text-[15px]">open_in_new</span>
+            Ouvrir dans Google Maps
+          </a>
+        )}
+      </div>
+
+      <div>
+        <p className="text-[12.5px] font-bold text-[#475467] mb-2">Trajet</p>
+        <Segmented
+          value={range}
+          onChange={onRange}
+          options={[
+            { value: 'none', label: 'Masqué' },
+            { value: '1', label: '1 h' },
+            { value: '6', label: '6 h' },
+            { value: '24', label: '24 h' },
+          ]}
+        />
+        {hours && (
+          <p className="text-[12.5px] text-[#667085] mt-3">
+            {isFetching && !route ? (
+              'Chargement du trajet…'
+            ) : !route || route.length < 2 ? (
+              'Aucun déplacement enregistré sur cette période.'
+            ) : (
+              <>
+                <strong className="text-[#101828]">{routeDistanceKm(route).toFixed(1)} km</strong> parcourus,{' '}
+                {route.length} points depuis {shortDateTime(route[0].fixTime)}.
+              </>
+            )}
+          </p>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default function MapViewPage() {
   const { data: entries, isLoading, isError } = useStudentPositions()
-  const located = (entries ?? []).filter((e) => e.position)
-  const unlocated = (entries ?? []).filter((e) => !e.position)
+  const [params, setParams] = useSearchParams()
+  const selectedId = params.get('student')
+  const [range, setRange] = useState<RouteRange>('none')
+
+  const select = (id: string | null) => {
+    setRange('none')
+    setParams(id ? { student: id } : {}, { replace: true })
+  }
+
+  const sorted = useMemo(
+    () =>
+      [...(entries ?? [])].sort(
+        (a, b) =>
+          TONE_ORDER[trackingSummary(a).tone] - TONE_ORDER[trackingSummary(b).tone] ||
+          a.lastName.localeCompare(b.lastName),
+      ),
+    [entries],
+  )
+  const selected = sorted.find((e) => e.studentId === selectedId) ?? null
+  const { data: route } = useStudentRoute(selected?.studentId ?? null, range === 'none' ? null : Number(range))
+
+  const points = useMemo(
+    () => sorted.map((e) => ({ ...e, id: e.studentId, name: `${e.firstName} ${e.lastName}`, subtitle: e.className })),
+    [sorted],
+  )
+  const located = sorted.filter((e) => e.position).length
 
   return (
     <AdminLayout title="Carte des élèves">
-      <div className="relative isolate bg-white border border-slate-100 rounded-xl overflow-hidden mb-4" style={{ height: 480 }}>
-        <MapContainer center={SENEGAL_CENTER} zoom={7} style={{ height: '100%', width: '100%' }}>
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {located.map((e) => (
-            <Marker key={e.studentId} position={[e.position!.latitude, e.position!.longitude]}>
-              <Popup>
-                <strong>{e.firstName} {e.lastName}</strong> <StatusBadge status={e.deviceStatus} /><br />
-                {new Date(e.position!.fixTime).toLocaleString()}<br />
-                Batterie : <span className={batteryClass(e.position)}>{batteryText(e.position)}</span>
-                {e.position!.address ? <><br />{e.position!.address}</> : null}
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      </div>
-
-      {isError ? (
-        <p className="text-red-600 text-sm">Impossible de récupérer les positions. Réessai automatique…</p>
-      ) : isLoading ? (
-        <p className="text-slate-400">Chargement…</p>
-      ) : (
-        <div className="bg-white border border-slate-100 rounded-xl p-4">
-          <p className="text-sm text-slate-500 mb-3">{located.length} élève(s) localisé(s) · {unlocated.length} sans position</p>
-          {(entries ?? []).length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-slate-400 border-b border-slate-100">
-                    <th className="py-2 pr-4 font-medium">Élève</th>
-                    <th className="py-2 pr-4 font-medium">Traceur</th>
-                    <th className="py-2 pr-4 font-medium">Batterie</th>
-                    <th className="py-2 font-medium">Dernière activité</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(entries ?? []).map((e) => (
-                    <tr key={e.studentId} className="border-b border-slate-50 last:border-0">
-                      <td className="py-2 pr-4 text-slate-800">{e.firstName} {e.lastName}</td>
-                      <td className="py-2 pr-4"><StatusBadge status={e.deviceStatus} /></td>
-                      <td className={`py-2 pr-4 ${batteryClass(e.position)}`}>{batteryText(e.position)}</td>
-                      <td className="py-2 text-slate-500">
-                        {e.lastUpdate ? new Date(e.lastUpdate).toLocaleString() : 'Jamais'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-4 lg:h-[calc(100vh-7.5rem)]">
+        <Panel className="flex flex-col min-h-0 order-2 lg:order-1 overflow-hidden">
+          {selected ? (
+            <div className="overflow-y-auto">
+              <StudentDetails entry={selected} range={range} onRange={setRange} onClose={() => select(null)} />
             </div>
+          ) : (
+            <>
+              <div className="px-5 pt-5 pb-3 border-b border-[#eef1f5]">
+                <p className="font-extrabold text-[16px] text-[#101828]">Élèves équipés</p>
+                <p className="text-[13px] font-semibold text-[#98a2b3]">
+                  {located} localisé{located > 1 ? 's' : ''} sur {sorted.length}
+                </p>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2">
+                {isLoading ? (
+                  <Loading />
+                ) : sorted.length === 0 ? (
+                  <EmptyState
+                    icon="gps_off"
+                    title="Aucun élève équipé"
+                    text="Attribuez un boîtier à un élève pour le voir apparaître ici."
+                    action={<Link to="/trackers"><Btn size="sm" icon="gps_fixed">Voir les boîtiers</Btn></Link>}
+                  />
+                ) : (
+                  sorted.map((e) => (
+                    <button
+                      key={e.studentId}
+                      onClick={() => select(e.studentId)}
+                      className={cn(
+                        'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition hover:bg-[#f7f9fc]',
+                      )}
+                    >
+                      <Avatar name={`${e.firstName} ${e.lastName}`} size={38} />
+                      <span className="flex-1 min-w-0">
+                        <span className="block font-bold text-[14px] text-[#101828] truncate">{e.firstName} {e.lastName}</span>
+                        <span className="block text-[12px] text-[#98a2b3] truncate">{trackingSummary(e).detail}</span>
+                      </span>
+                      <span className="flex flex-col items-end gap-1 shrink-0">
+                        <TrackingPill live={e} />
+                        <Battery position={e.position} className="text-[12px]" />
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </>
           )}
+        </Panel>
+
+        <div className="flex flex-col gap-3 min-h-0 order-1 lg:order-2">
+          {isError && <ErrorNote>Impossible de récupérer les positions. Nouvel essai automatique…</ErrorNote>}
+          <TrackingMap
+            points={points}
+            selectedId={selectedId}
+            onSelect={select}
+            route={selected ? route : undefined}
+            className="h-[420px] lg:h-auto lg:flex-1 bg-white border border-[#e8ecf2] rounded-[20px]"
+          />
         </div>
-      )}
+      </div>
     </AdminLayout>
   )
 }
