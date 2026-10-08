@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { AdminLayout } from '../../components/layout/AdminLayout'
 import { AddTrackersDialog, EditTrackerDialog, TrackerSchoolDialog } from '../../components/trackers/FleetDialogs'
 import { DirectSaleDialog, SubscriptionDialog } from '../../components/billing/BillingDialogs'
+import { CommandDialog } from '../../components/trackers/CommandDialog'
 import { TrackerStatePill } from '../../components/trackers/TrackerBits'
 import {
   Btn, ConfirmDialog, EmptyState, IconBtn, Loading, PageContainer, Panel, Pill, SearchInput, Segmented, StatCard,
@@ -32,6 +33,8 @@ export default function FleetListPage() {
     coverage: coverage || undefined,
   })
   const directReturn = useDirectReturn()
+  // `'batch'` : commande à tous les boîtiers des filtres ; sinon le boîtier visé
+  const [commanding, setCommanding] = useState<Tracker | 'batch' | null>(null)
   const [subscribing, setSubscribing] = useState<Tracker | null>(null)
   const [selling, setSelling] = useState<Tracker | null>(null)
   const [returning, setReturning] = useState<Tracker | null>(null)
@@ -77,6 +80,9 @@ export default function FleetListPage() {
             placeholder="Rechercher par IMEI, étiquette ou numéro de SIM…"
           />
           <div className="flex gap-2">
+            <Btn variant="secondary" icon="terminal" onClick={() => setCommanding('batch')} disabled={!data?.total}>
+              Commande
+            </Btn>
             <Link to="/plans"><Btn variant="secondary" icon="sell">Formules</Btn></Link>
             <Link to="/fleet/map"><Btn variant="secondary" icon="map">Carte</Btn></Link>
             <Btn icon="add" onClick={() => setAdding(true)}>Enregistrer des boîtiers</Btn>
@@ -194,6 +200,13 @@ export default function FleetListPage() {
                       onClick={() => sync.mutate(t.id)}
                     />
                   )}
+                  <IconBtn
+                    icon="terminal"
+                    label={t.traccarDeviceId === null ? "Non relié : aucune commande possible" : 'Envoyer une commande'}
+                    tone="blue"
+                    disabled={t.traccarDeviceId === null}
+                    onClick={() => setCommanding(t)}
+                  />
                   <IconBtn icon="payments" label="Abonnement et paiements" tone="blue" onClick={() => setSubscribing(t)} />
                   {!t.schoolId && !t.studentId && (
                     <IconBtn
@@ -240,6 +253,19 @@ export default function FleetListPage() {
       {adding && <AddTrackersDialog onClose={() => setAdding(false)} />}
       {editing && <EditTrackerDialog tracker={editing} onClose={() => setEditing(null)} />}
       {moving && <TrackerSchoolDialog tracker={moving} onClose={() => setMoving(null)} />}
+      {commanding === 'batch' && (
+        <CommandDialog
+          filters={{ search: search.trim() || undefined, assignment: filter === 'all' ? undefined : filter, coverage: coverage || undefined }}
+          count={data?.total ?? 0}
+          targetLabel={
+            filter === 'all' && !coverage && !search.trim()
+              ? `Tous les boîtiers du parc (${data?.total ?? 0})`
+              : `Les ${data?.total ?? 0} boîtiers correspondant aux filtres actuels de la liste`
+          }
+          onClose={() => setCommanding(null)}
+        />
+      )}
+      {commanding && commanding !== 'batch' && <CommandDialog tracker={commanding} onClose={() => setCommanding(null)} />}
       {subscribing && <SubscriptionDialog tracker={subscribing} onClose={() => setSubscribing(null)} />}
       {selling && <DirectSaleDialog tracker={selling} onClose={() => setSelling(null)} />}
 

@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient, QueryClient } from '@tanstack/react-query'
 import { trackersService, mySchoolTrackersService } from '../api/services/trackersService'
-import { AlarmStatusFilter, CreateTrackerDto, TrackerFilters, UpdateTrackerDto } from '../api/types'
+import {
+  AlarmStatusFilter, CreateTrackerDto, SendCommandDto, TrackerCommandStatus, TrackerFilters, UpdateTrackerDto,
+} from '../api/types'
 import { useToast } from './useToast'
 
 const errorMessage = (e: any, fallback: string) => {
@@ -113,6 +115,38 @@ export function useDeleteTracker() {
       toast.success('Boîtier supprimé')
     },
     onError: (e: any) => toast.error(errorMessage(e, 'Erreur lors de la suppression')),
+  })
+}
+
+// ========== Commandes (admin BAAWA) ==========
+
+export function useSendCommand() {
+  const qc = useQueryClient()
+  const { toast } = useToast()
+  return useMutation({
+    mutationFn: (data: SendCommandDto) => trackersService.sendCommand(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['trackers', 'commands'] }),
+    onError: (e: any) => toast.error(errorMessage(e, "Erreur lors de l'envoi de la commande")),
+  })
+}
+
+/**
+ * Commandes d'un lot ou d'un boîtier. Rafraîchi toutes les 4 secondes tant que
+ * des réponses sont attendues : elles arrivent après l'envoi, parfois bien après.
+ */
+export function useTrackerCommands(
+  params: { batchId?: string; trackerId?: string; status?: TrackerCommandStatus },
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: ['trackers', 'commands', params],
+    queryFn: () => trackersService.getCommands({ ...params, limit: 200 }),
+    placeholderData: (previous) => previous,
+    enabled: enabled && !!(params.batchId || params.trackerId),
+    refetchInterval: (query) => {
+      const counts = query.state.data?.counts
+      return counts && counts.SENT + counts.QUEUED > 0 ? 4_000 : false
+    },
   })
 }
 
