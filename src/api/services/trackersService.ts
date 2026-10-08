@@ -1,8 +1,8 @@
 import { apiClient } from '../client'
 import {
   AlarmStatusFilter, BulkCreateTrackersResult, CreateSubscriptionDto, CreateTrackerDto, DirectSaleDto,
-  FleetPositionEntry, Paged, Plan, PlanInput, SchoolTracker, Subscription, SubscriptionStats, Tracker,
-  TrackerAlarm, TrackerFilters, TrackerStats, UpdateTrackerDto,
+  FleetPositionEntry, Paged, Plan, PlanInput, SchoolTracker, SendCommandDto, SendCommandResult, Subscription,
+  SubscriptionStats, Tracker, TrackerAlarm, TrackerCommandList, TrackerFilters, TrackerStats, UpdateTrackerDto,
 } from '../types'
 
 function toQuery(params: object): string {
@@ -69,6 +69,14 @@ export const trackersService = {
   },
   cancelSubscription: async (subscriptionId: string): Promise<Subscription> => {
     const res = await apiClient.post(`/subscriptions/${subscriptionId}/cancel`, {})
+    return (res as any).data
+  },
+  sendCommand: async (data: SendCommandDto): Promise<SendCommandResult> => {
+    const res = await apiClient.post('/trackers/commands', data)
+    return (res as any).data
+  },
+  getCommands: async (params: { batchId?: string; trackerId?: string; status?: string; limit?: number }): Promise<TrackerCommandList> => {
+    const res = await apiClient.get(`/trackers/commands${toQuery(params)}`)
     return (res as any).data
   },
   getSubscriptionStats: async (): Promise<SubscriptionStats> => {

@@ -590,6 +590,51 @@ export interface DirectSaleDto {
   parentName?: string
 }
 
+// ========== COMMANDES ENVOYÉES AUX BOÎTIERS ==========
+
+/** QUEUED : boîtier éteint, envoi à sa prochaine connexion ; SENT : partie, réponse attendue. */
+export type TrackerCommandStatus = 'QUEUED' | 'SENT' | 'ANSWERED' | 'FAILED'
+
+export interface TrackerCommand {
+  id: string
+  trackerId: string
+  batchId: string
+  /** Texte réellement envoyé, variables remplacées */
+  command: string
+  status: TrackerCommandStatus
+  response: string | null
+  error: string | null
+  createdAt: string
+  answeredAt: string | null
+  tracker: {
+    id: string
+    imei: string
+    label?: string | null
+    school: { id: string; name: string } | null
+    student: { id: string; firstName: string; lastName: string } | null
+  }
+}
+
+export interface SendCommandDto extends Omit<TrackerFilters, 'page' | 'limit'> {
+  command: string
+  /** 'selection' : les boîtiers de trackerIds ; 'filter' : tous ceux des filtres */
+  target: 'selection' | 'filter'
+  trackerIds?: string[]
+  confirmRisky?: boolean
+}
+
+export interface SendCommandResult {
+  batchId: string
+  total: number
+  sent: number
+  queued: number
+  failed: number
+}
+
+export interface TrackerCommandList extends Paged<TrackerCommand> {
+  counts: Record<TrackerCommandStatus, number>
+}
+
 export type AlarmStatusFilter = 'open' | 'acknowledged' | 'all'
 
 // ========== NOTIFICATION TYPES ==========
