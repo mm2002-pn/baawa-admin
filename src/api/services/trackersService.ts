@@ -1,6 +1,6 @@
 import { apiClient } from '../client'
 import {
-  AlarmStatusFilter, BulkCreateTrackersResult, CreateSubscriptionDto, CreateTrackerDto, DirectSaleDto,
+  AlarmStatusFilter, BulkCreateTrackersResult, CommandTemplate, CommandTemplateInput, CreateSubscriptionDto, CreateTrackerDto, DirectSaleDto,
   FleetPositionEntry, Paged, Plan, PlanInput, SchoolTracker, SendCommandDto, SendCommandResult, Subscription,
   SubscriptionStats, Tracker, TrackerAlarm, TrackerCommandList, TrackerFilters, TrackerStats, UpdateTrackerDto,
 } from '../types'
@@ -82,6 +82,25 @@ export const trackersService = {
   getSubscriptionStats: async (): Promise<SubscriptionStats> => {
     const res = await apiClient.get('/subscriptions/stats')
     return (res as any).data
+  },
+}
+
+/** Catalogue des commandes de boîtier — réservé à l'admin BAAWA. */
+export const commandTemplatesService = {
+  getAll: async (activeOnly = false): Promise<CommandTemplate[]> => {
+    const res = await apiClient.get(`/command-templates${activeOnly ? '?active=true' : ''}`)
+    return (res as any).data
+  },
+  create: async (data: CommandTemplateInput): Promise<CommandTemplate> => {
+    const res = await apiClient.post('/command-templates', data)
+    return (res as any).data
+  },
+  update: async (id: string, data: Partial<CommandTemplateInput>): Promise<CommandTemplate> => {
+    const res = await apiClient.patch(`/command-templates/${id}`, data)
+    return (res as any).data
+  },
+  remove: async (id: string): Promise<void> => {
+    await apiClient.delete(`/command-templates/${id}`)
   },
 }
 

@@ -30,6 +30,7 @@ const SchoolAlertsPage = lazy(() => import('../pages/school/Alerts'))
 const FleetPage = lazy(() => import('../pages/fleet/FleetList'))
 const FleetMapPage = lazy(() => import('../pages/fleet/FleetMap'))
 const PlansPage = lazy(() => import('../pages/fleet/PlansList'))
+const CommandCataloguePage = lazy(() => import('../pages/fleet/CommandCatalogue'))
 const NotificationsSettingsPage = lazy(() => import('../pages/settings/NotificationsSettings'))
 
 const LoadingFallback = () => (
@@ -246,6 +247,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
         <Suspense fallback={<LoadingFallback />}><PlansPage /></Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/fleet/commands',
+    element: (
+      <ProtectedRoute allowedRoles={[Role.ADMIN_BAAWA]}>
+        <Suspense fallback={<LoadingFallback />}><CommandCataloguePage /></Suspense>
       </ProtectedRoute>
     ),
   },
