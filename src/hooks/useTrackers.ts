@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient, QueryClient } from '@tanstack/react-query'
-import { trackersService, mySchoolTrackersService } from '../api/services/trackersService'
+import { commandTemplatesService, trackersService, mySchoolTrackersService } from '../api/services/trackersService'
 import {
-  AlarmStatusFilter, CreateTrackerDto, SendCommandDto, TrackerCommandStatus, TrackerFilters, UpdateTrackerDto,
+  AlarmStatusFilter, CommandTemplateInput, CreateTrackerDto, SendCommandDto, TrackerCommandStatus, TrackerFilters, UpdateTrackerDto,
 } from '../api/types'
 import { useToast } from './useToast'
 
@@ -147,6 +147,42 @@ export function useTrackerCommands(
       const counts = query.state.data?.counts
       return counts && counts.SENT + counts.QUEUED > 0 ? 4_000 : false
     },
+  })
+}
+
+// ========== Catalogue de commandes (admin BAAWA) ==========
+
+export function useCommandTemplates(activeOnly = false) {
+  return useQuery({
+    queryKey: ['command-templates', activeOnly],
+    queryFn: () => commandTemplatesService.getAll(activeOnly),
+  })
+}
+
+export function useSaveCommandTemplate() {
+  const qc = useQueryClient()
+  const { toast } = useToast()
+  return useMutation({
+    mutationFn: ({ id, data }: { id?: string; data: Partial<CommandTemplateInput> }) =>
+      id ? commandTemplatesService.update(id, data) : commandTemplatesService.create(data as CommandTemplateInput),
+    onSuccess: (_, { id }) => {
+      qc.invalidateQueries({ queryKey: ['command-templates'] })
+      toast.success(id ? 'Commande mise à jour' : 'Commande ajoutée au catalogue')
+    },
+    onError: (e: any) => toast.error(errorMessage(e, "Erreur lors de l'enregistrement")),
+  })
+}
+
+export function useDeleteCommandTemplate() {
+  const qc = useQueryClient()
+  const { toast } = useToast()
+  return useMutation({
+    mutationFn: (id: string) => commandTemplatesService.remove(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['command-templates'] })
+      toast.success('Commande retirée du catalogue')
+    },
+    onError: (e: any) => toast.error(errorMessage(e, 'Erreur lors de la suppression')),
   })
 }
 

@@ -1,19 +1,14 @@
 import { useState } from 'react'
-import { SendCommandDto, Tracker, TrackerCommand, TrackerCommandStatus, TrackerFilters } from '../../api/types'
-import { useSendCommand, useTrackerCommands } from '../../hooks/useTrackers'
+import { Link } from 'react-router-dom'
+import {
+  CommandParam, CommandTemplate, SendCommandDto, Tracker, TrackerCommand, TrackerCommandStatus, TrackerFilters,
+} from '../../api/types'
+import { useCommandTemplates, useSendCommand, useTrackerCommands } from '../../hooks/useTrackers'
+import { COMMAND_FORMAT, missingParams, previewCommand, RISKY_COMMAND } from '../../utils/commands'
 import { shortDateTime, trackerName } from '../../utils/tracking'
 import { cn } from '../../utils/cn'
-import { Btn, Dialog, Field, Loading, Pill, Tone } from '../ui/kit'
+import { Btn, Dialog, EmptyState, Field, Loading, Pill, Tone } from '../ui/kit'
 import { inputClass } from '../ui/styles'
-
-/** Commandes proposées en un clic. Le texte est celui des commandes SMS du boîtier. */
-const PRESETS: { label: string; command: string; hint: string }[] = [
-  { label: 'Lire les réglages', command: 'PARAM#', hint: 'Le boîtier renvoie son IMEI, ses intervalles d’envoi et ses numéros SOS.' },
-  { label: 'Numéro SOS = parent', command: 'SOS,A,{parent}#', hint: 'Enregistre le numéro du parent de chaque boîtier comme numéro SOS.' },
-]
-
-/** Mêmes commandes que le serveur considère comme risquées : elles peuvent détacher le boîtier de BAAWA. */
-const RISKY = /^\s*(SERVER|APN|FACTORY|RESET)\b/i
 
 const COUNT_LABEL: Record<TrackerCommandStatus, (n: number) => string> = {
   ANSWERED: (n) => (n > 1 ? 'réponses' : 'réponse'),
@@ -44,7 +39,10 @@ function CommandRow({ command, showTracker }: { command: TrackerCommand; showTra
               </p>
             </>
           ) : (
-            <p className="text-[12.5px] font-semibold text-[#98a2b3]">{shortDateTime(command.createdAt)}</p>
+            <>
+              {command.label && <p className="font-bold text-[14px] text-[#101828] truncate">{command.label}</p>}
+              <p className="text-[12.5px] font-semibold text-[#98a2b3]">{shortDateTime(command.createdAt)}</p>
+            </>
           )}
         </div>
         <code className="font-mono text-[12.5px] text-[#475467] bg-white border border-[#e2e7ee] rounded-md px-2 py-0.5">{command.command}</code>
@@ -61,6 +59,40 @@ function CommandRow({ command, showTracker }: { command: TrackerCommand; showTra
   )
 }
 
+/** Champ de saisie d'un paramètre, selon son type. */
+function ParamField({ param, value, onChange }: { param: CommandParam; value: string; onChange: (v: string) => void }) {
+  const label = `${param.label}${param.required === false ? '' : ' *'}`
+  if (param.type === 'phones') {
+    return (
+      <Field label={label} hint={`Jusqu'à ${param.maxItems ?? 4} numéros, un par ligne ou séparés par des virgules.`}>
+        <textarea
+          rows={2}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={param.placeholder}
+          className={cn(inputClass, 'font-mono resize-none')}
+        />
+      </Field>
+    )
+  }
+  const bounds = param.type === 'number' && (param.min !== undefined || param.max !== undefined)
+    ? `Entre ${param.min ?? '…'} et ${param.max ?? '…'}.`
+    : undefined
+  return (
+    <Field label={label} hint={bounds}>
+      <input
+        type={param.type === 'number' ? 'number' : param.type === 'phone' ? 'tel' : 'text'}
+        min={param.min}
+        max={param.max}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={param.placeholder}
+        className={cn(inputClass, param.type !== 'text' && 'font-mono')}
+      />
+    </Field>
+  )
+}
+
 interface Props {
   /** Un boîtier précis ; sinon la commande vise tous ceux des filtres */
   tracker?: Tracker
@@ -73,12 +105,18 @@ interface Props {
 }
 
 /**
- * Envoi d'une commande à un boîtier ou à tout un ensemble, puis suivi des réponses.
- * Monté uniquement quand il est ouvert.
+ * Envoi d'une commande à un boîtier ou à tout un ensemble, puis suivi des
+ * réponses. L'admin choisit une action dans le catalogue et remplit ses
+ * champs ; la saisie libre reste possible. Monté uniquement quand il est ouvert.
  */
 export function CommandDialog({ tracker, filters, count = 0, targetLabel, onClose }: Props) {
   const send = useSendCommand()
-  const [command, setCommand] = useState('')
+  const catalogue = useCommandTemplates(true)
+  const [template, setTemplate] = useState<CommandTemplate | null>(null)
+  const [values, setValues] = useState<Record<string, string>>({})
+  // Saisie libre, pour une commande qui n'est pas encore au catalogue
+  const [advanced, setAdvanced] = useState(false)
+  const [freeText, setFreeText] = useState('')
   const [confirmRisky, setConfirmRisky] = useState(false)
   const [batchId, setBatchId] = useState<string | null>(null)
   // Statut affiché dans la liste des résultats ; null : tous
@@ -87,22 +125,32 @@ export function CommandDialog({ tracker, filters, count = 0, targetLabel, onClos
   const batch = useTrackerCommands({ batchId: batchId ?? undefined, status: only ?? undefined })
   const history = useTrackerCommands({ trackerId: tracker?.id }, !!tracker)
 
-  const text = command.trim()
-  const risky = RISKY.test(text)
-  const formatError = text && !/^[\x20-\x7E]{1,160}#$/.test(text) ? 'La commande doit se terminer par # (caractères simples, 160 au plus).' : null
-  const preset = PRESETS.find((p) => p.command === text)
   const total = tracker ? 1 : count
+  const text = freeText.trim()
+  const formatError = advanced && text && !COMMAND_FORMAT.test(text) ? 'La commande doit se terminer par # (caractères simples, 160 au plus).' : null
+  const preview = template ? previewCommand(template, values) : ''
+  const missing = template ? missingParams(template, values) : []
+  const risky = advanced ? RISKY_COMMAND.test(text) : !!template && (template.risky || RISKY_COMMAND.test(preview))
+  const ready = advanced ? !!text && !formatError : !!template && missing.length === 0
+
+  const pick = (t: CommandTemplate) => {
+    setTemplate(t)
+    setValues(Object.fromEntries(t.params.map((p) => [p.key, p.defaultValue ?? ''])))
+    setConfirmRisky(false)
+  }
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
+    const what: Pick<SendCommandDto, 'templateId' | 'values' | 'command'> = advanced
+      ? { command: text }
+      : { templateId: template!.id, values }
     const dto: SendCommandDto = tracker
-      ? { command: text, target: 'selection', trackerIds: [tracker.id], confirmRisky }
-      : { ...filters, command: text, target: 'filter', confirmRisky }
+      ? { ...what, target: 'selection', trackerIds: [tracker.id], confirmRisky }
+      : { ...filters, ...what, target: 'filter', confirmRisky }
     send.mutate(dto, {
       onSuccess: (result) => {
         setBatchId(result.batchId)
         setOnly(null)
-        setCommand('')
         setConfirmRisky(false)
       },
     })
@@ -133,7 +181,7 @@ export function CommandDialog({ tracker, filters, count = 0, targetLabel, onClos
               form="command-form"
               icon="send"
               loading={send.isPending}
-              disabled={!text || !!formatError || total === 0 || (risky && !confirmRisky)}
+              disabled={!ready || total === 0 || (risky && !confirmRisky)}
             >
               {tracker ? 'Envoyer' : `Envoyer à ${total} boîtier${total > 1 ? 's' : ''}`}
             </Btn>
@@ -180,39 +228,74 @@ export function CommandDialog({ tracker, filters, count = 0, targetLabel, onClos
         </div>
       ) : (
         <form id="command-form" onSubmit={submit} className="flex flex-col gap-4">
-          <div>
-            <p className="text-[12.5px] font-bold text-[#475467] mb-2">Commandes courantes</p>
-            <div className="flex flex-wrap gap-2">
-              {PRESETS.map((p) => (
-                <button
-                  key={p.command}
-                  type="button"
-                  onClick={() => setCommand(p.command)}
-                  className={cn(
-                    'px-3 py-2 rounded-[10px] border text-[13px] font-bold transition',
-                    text === p.command ? 'border-[#2563eb] bg-[#f5f8ff] text-[#1d4ed8]' : 'border-[#e2e7ee] bg-white text-[#475467] hover:bg-[#f7f9fc]',
-                  )}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <Field
-            label="Commande"
-            error={formatError}
-            hint={preset?.hint ?? 'Le même texte qu’une commande SMS, terminé par #. {parent} est remplacé par le numéro du parent de chaque boîtier.'}
-          >
-            <input
-              autoFocus
-              value={command}
-              onChange={(e) => { setCommand(e.target.value); setConfirmRisky(false) }}
-              placeholder="PARAM#"
-              spellCheck={false}
-              className={cn(inputClass, 'font-mono')}
+          {advanced ? (
+            <Field
+              label="Commande libre"
+              error={formatError}
+              hint="Le même texte qu’une commande SMS, terminé par #. {parent} est remplacé par le numéro du parent de chaque boîtier."
+            >
+              <input
+                autoFocus
+                value={freeText}
+                onChange={(e) => { setFreeText(e.target.value); setConfirmRisky(false) }}
+                placeholder="PARAM#"
+                spellCheck={false}
+                className={cn(inputClass, 'font-mono')}
+              />
+            </Field>
+          ) : catalogue.isLoading ? (
+            <Loading />
+          ) : !catalogue.data?.length ? (
+            <EmptyState
+              icon="list_alt"
+              title="Le catalogue est vide"
+              text={<>Ajoutez des commandes depuis le <Link to="/fleet/commands" className="font-bold text-[#2563eb]">catalogue</Link>, ou utilisez la saisie libre ci-dessous.</>}
             />
-          </Field>
+          ) : (
+            <div>
+              <p className="text-[12.5px] font-bold text-[#475467] mb-2">Que voulez-vous faire ?</p>
+              <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1" role="radiogroup">
+                {catalogue.data.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={template?.id === t.id}
+                    onClick={() => pick(t)}
+                    className={cn(
+                      'text-left rounded-[13px] border px-[14px] py-3 transition',
+                      template?.id === t.id ? 'border-[#2563eb] bg-[#f5f8ff]' : 'border-[#eef1f5] bg-[#f9fafc] hover:border-[#d3dbe6]',
+                    )}
+                  >
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="font-bold text-[14px] text-[#101828]">{t.name}</span>
+                      {t.risky && <Pill tone="red" icon="warning">À risque</Pill>}
+                      {!t.verified && <Pill tone="amber" title="Cette commande n'a pas encore été essayée sur un vrai boîtier">Non vérifiée</Pill>}
+                    </span>
+                    {t.description && <span className="block text-[12.5px] text-[#667085] mt-1">{t.description}</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!advanced && template && (
+            <>
+              {template.params.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {template.params.map((p) => (
+                    <div key={p.key} className={cn(p.type === 'phones' && 'sm:col-span-2')}>
+                      <ParamField param={p} value={values[p.key] ?? ''} onChange={(v) => setValues((old) => ({ ...old, [p.key]: v }))} />
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#eef1f5] bg-[#f9fafc] px-4 py-3">
+                <span className="text-[12.5px] font-bold text-[#667085]">Commande envoyée</span>
+                <code className="font-mono text-[13px] text-[#101828] break-all">{preview}</code>
+              </div>
+            </>
+          )}
 
           {risky && (
             <label className="flex items-start gap-3 rounded-xl border border-[#fecdca] bg-[#fef3f2] px-4 py-3 cursor-pointer">
@@ -228,10 +311,17 @@ export function CommandDialog({ tracker, filters, count = 0, targetLabel, onClos
             <p className="text-[13px] font-semibold text-[#b42318]">Aucun boîtier ne correspond aux filtres actuels.</p>
           )}
 
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[12.5px] font-bold">
+            <button type="button" className="text-[#2563eb] hover:underline" onClick={() => { setAdvanced(!advanced); setConfirmRisky(false) }}>
+              {advanced ? '← Revenir au catalogue' : 'Commande libre (avancé)'}
+            </button>
+            <Link to="/fleet/commands" className="text-[#667085] hover:text-[#2563eb]">Gérer le catalogue</Link>
+          </div>
+
           {tracker && !!history.data?.data.length && (
             <div>
               <p className="text-[12.5px] font-bold text-[#475467] mb-2">Dernières commandes de ce boîtier</p>
-              <div className="flex flex-col gap-2 max-h-[240px] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1">
                 {history.data.data.slice(0, 10).map((c) => <CommandRow key={c.id} command={c} showTracker={false} />)}
               </div>
             </div>

@@ -599,6 +599,8 @@ export interface TrackerCommand {
   id: string
   trackerId: string
   batchId: string
+  /** Nom de la commande dans le catalogue, si elle en vient */
+  label?: string | null
   /** Texte réellement envoyé, variables remplacées */
   command: string
   status: TrackerCommandStatus
@@ -615,8 +617,47 @@ export interface TrackerCommand {
   }
 }
 
+export type CommandParamType = 'text' | 'number' | 'phone' | 'phones'
+
+/** Un champ que l'admin remplit avant d'envoyer une commande du catalogue. */
+export interface CommandParam {
+  /** Nom de la variable dans le modèle : {key} */
+  key: string
+  label: string
+  type: CommandParamType
+  required?: boolean
+  min?: number
+  max?: number
+  /** Nombre maximal de numéros (type phones) */
+  maxItems?: number
+  placeholder?: string
+  defaultValue?: string
+}
+
+/** Une entrée du catalogue de commandes. */
+export interface CommandTemplate {
+  id: string
+  name: string
+  description?: string | null
+  /** Commande du boîtier, terminée par # ; les valeurs à saisir sont {entre accolades} */
+  template: string
+  params: CommandParam[]
+  /** Peut détacher le boîtier du serveur : confirmation exigée */
+  risky: boolean
+  /** Essayée avec succès sur un vrai boîtier */
+  verified: boolean
+  isActive: boolean
+  sortOrder: number
+}
+
+export type CommandTemplateInput = Omit<CommandTemplate, 'id'>
+
 export interface SendCommandDto extends Omit<TrackerFilters, 'page' | 'limit'> {
-  command: string
+  /** Entrée du catalogue, avec les valeurs de ses champs… */
+  templateId?: string
+  values?: Record<string, string>
+  /** …ou commande libre */
+  command?: string
   /** 'selection' : les boîtiers de trackerIds ; 'filter' : tous ceux des filtres */
   target: 'selection' | 'filter'
   trackerIds?: string[]
