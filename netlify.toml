@@ -5,15 +5,7 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# Landing page sur baawa-sn.com
-[[redirects]]
-  from = "/*"
-  to = "/landing.html"
-  status = 200
-  force = true
-  conditions = {Host = ["baawa-sn.com", "www.baawa-sn.com"]}
-
-# SPA fallback pour le back-office (admin.baawa-sn.com)
+# SPA fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"
