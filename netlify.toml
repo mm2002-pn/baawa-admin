@@ -5,7 +5,15 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# SPA fallback: every route serves index.html (React Router handles routing)
+# Landing page sur baawa-sn.com
+[[redirects]]
+  from = "/*"
+  to = "/landing.html"
+  status = 200
+  force = true
+  conditions = {Host = ["baawa-sn.com", "www.baawa-sn.com"]}
+
+# SPA fallback pour le back-office (admin.baawa-sn.com)
 [[redirects]]
   from = "/*"
   to = "/index.html"
